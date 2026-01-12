@@ -1,65 +1,60 @@
-/* Reset and Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box; /* Crucial: keeps padding inside the defined width/height */
-}
-
+/* Reset body to allow absolute positioning of children */
 body {
-  min-height: 100vh;
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
   position: relative;
-  font-family: 'Courier', monospace; [cite: 34]
+  font-family: 'Courier', monospace; /* [cite: 34] */
 }
 
-/* Position Letters in Top Left */
+/* Container for Letters (Top-Left) */
 .letters {
   position: absolute;
   top: 0;
   left: 0;
-  display: flex; /* Aligns C, S, and E in a row */
+  display: flex; /* Horizontal layout for CSE in Advanced view */
 }
 
-/* Position Numbers in Bottom Right */
-.numbers {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  display: flex; /* Aligns 1, 8, and 6 in a row */
-  border: 10px solid yellow; [cite: 68]
-}
-
-/* Letter Specifics: 100x180px */
 .letter {
-  width: 100px; 
-  height: 180px; 
-  background-color: navy; 
-  color: white; 
-  font-size: 60px; [cite: 69]
-  /* Top-left alignment with 8px offset */
-  padding: 6px 0 0 8px; 
-  text-align: left;
-}
-
-/* Number Specifics: 60x60px */
-.number {
-  width: 60px; [cite: 68]
-  height: 60px; [cite: 68]
-  background-color: black; [cite: 68]
-  color: yellow; [cite: 68]
-  font-size: 40px; [cite: 69]
-  /* Centered within their 60x60 boxes */
+  width: 100px; /*  */
+  height: 180px; /*  */
+  background-color: navy; /*  */
+  color: white; /*  */
+  font-size: 60px; /*  */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Hover Effects (Reverse Video) */
+/* Letter Hover Effect: Reverse Video [cite: 70] */
 .letter:hover {
-  background-color: white; [cite: 70]
-  color: navy; [cite: 70]
+  background-color: white;
+  color: navy;
 }
 
+/* Container for Numbers (Bottom-Right) */
+.numbers {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex; /* Horizontal layout for 186 */
+}
+
+.number {
+  width: 60px; /*  */
+  height: 60px; /*  */
+  background-color: black; /*  */
+  color: yellow; /*  */
+  border: 10px solid yellow; /*  */
+  font-size: 40px; /*  */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box; /* Ensures border is included in 60x60px  */
+}
+
+/* Number Hover Effect: Reverse Video [cite: 75] */
 .number:hover {
-  background-color: yellow; [cite: 75]
-  color: black; [cite: 75]
+  background-color: yellow;
+  color: black;
 }
