@@ -1,15 +1,13 @@
-* {
-  margin: 0;
-  padding: 0;
-}
-
 body {
-  text-align: center;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
 }
 
-.container {
-  display: inline-block;
-  margin-top: 8px;
+.main-container {
+  display: flex;
+  flex-direction: column;
 }
 
 .char {
@@ -20,5 +18,6 @@ body {
   font-size: 40px;
   font-family: 'Courier', monospace;
   line-height: 60px;
+  text-align: center;
   display: block;
 }
