@@ -1,0 +1,68 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Letters remain in the top-left [cite: 58] */
+.letters {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+}
+
+/* Numbers box pinned to the bottom-right [cite: 58] */
+.numbers-box {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    background-color: black;      /* Entire box is black  */
+    border: 10px solid yellow;   /* 10px yellow border around the box  */
+}
+
+.char {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Courier', monospace; [cite: 34]
+}
+
+/* Letter styling: 100x180px, navy-blue, white 60px text [cite: 67, 69] */
+.letter {
+    width: 100px;           /* [cite: 67] */
+    height: 180px;          /* [cite: 67] */
+    background-color: navy; /* [cite: 67] */
+    color: white;           /* [cite: 67] */
+    font-size: 60px;        /* [cite: 69] */
+    
+    /* 1. Force the letter to the top-left */
+    display: flex;
+    justify-content: flex-start; /* Horizontal: Left */
+    align-items: flex-start;     /* Vertical: Top */
+
+    /* 2. Strip font line-height */
+    /* Fonts have built-in vertical space; setting this to 1 or less 
+       removes the 'gap' above the letter. */
+    line-height: 1.; 
+}
+/* Number styling: 60x60px, yellow 40px text [cite: 68, 69] */
+.number {
+    width: 60px;
+    height: 60px;
+    color: yellow;
+    font-size: 40px;
+}
+
+/* Hover effects for "reverse video" [cite: 70, 75] */
+.letter:hover {
+    background-color: white;
+    color: navy;
+}
+
+/* Hovering over a number turns its specific background white [cite: 75, 76] */
+.number:hover {
+    background-color: yellow;
+    color: black;
+}}

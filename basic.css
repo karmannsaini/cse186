@@ -1,0 +1,24 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  text-align: center;
+}
+
+.container {
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.char {
+  width: 60px;
+  height: 60px;
+  background-color: yellow;
+  color: black;
+  font-size: 40px;
+  font-family: 'Courier', monospace;
+  line-height: 60px;
+  display: block;
+}
