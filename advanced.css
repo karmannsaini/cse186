@@ -1,68 +1,65 @@
+/* Reset and Base Styles */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Crucial: keeps padding inside the defined width/height */
 }
 
-/* Letters remain in the top-left [cite: 58] */
+body {
+  min-height: 100vh;
+  position: relative;
+  font-family: 'Courier', monospace; [cite: 34]
+}
+
+/* Position Letters in Top Left */
 .letters {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex; /* Aligns C, S, and E in a row */
 }
 
-/* Numbers box pinned to the bottom-right [cite: 58] */
-.numbers-box {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    display: flex;
-    background-color: black;      /* Entire box is black  */
-    border: 10px solid yellow;   /* 10px yellow border around the box  */
+/* Position Numbers in Bottom Right */
+.numbers {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex; /* Aligns 1, 8, and 6 in a row */
+  border: 10px solid yellow; [cite: 68]
 }
 
-.char {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Courier', monospace; [cite: 34]
-}
-
-/* Letter styling: 100x180px, navy-blue, white 60px text [cite: 67, 69] */
+/* Letter Specifics: 100x180px */
 .letter {
-    width: 100px;           /* [cite: 67] */
-    height: 180px;          /* [cite: 67] */
-    background-color: navy; /* [cite: 67] */
-    color: white;           /* [cite: 67] */
-    font-size: 60px;        /* [cite: 69] */
-    
-    /* 1. Force the letter to the top-left */
-    display: flex;
-    justify-content: flex-start; /* Horizontal: Left */
-    align-items: flex-start;     /* Vertical: Top */
-
-    /* 2. Strip font line-height */
-    /* Fonts have built-in vertical space; setting this to 1 or less 
-       removes the 'gap' above the letter. */
-    line-height: 1.; 
+  width: 100px; 
+  height: 180px; 
+  background-color: navy; 
+  color: white; 
+  font-size: 60px; [cite: 69]
+  /* Top-left alignment with 8px offset */
+  padding: 6px 0 0 8px; 
+  text-align: left;
 }
-/* Number styling: 60x60px, yellow 40px text [cite: 68, 69] */
+
+/* Number Specifics: 60x60px */
 .number {
-    width: 60px;
-    height: 60px;
-    color: yellow;
-    font-size: 40px;
+  width: 60px; [cite: 68]
+  height: 60px; [cite: 68]
+  background-color: black; [cite: 68]
+  color: yellow; [cite: 68]
+  font-size: 40px; [cite: 69]
+  /* Centered within their 60x60 boxes */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Hover effects for "reverse video" [cite: 70, 75] */
+/* Hover Effects (Reverse Video) */
 .letter:hover {
-    background-color: white;
-    color: navy;
+  background-color: white; [cite: 70]
+  color: navy; [cite: 70]
 }
 
-/* Hovering over a number turns its specific background white [cite: 75, 76] */
 .number:hover {
-    background-color: yellow;
-    color: black;
-}}
+  background-color: yellow; [cite: 75]
+  color: black; [cite: 75]
+}
