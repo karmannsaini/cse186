@@ -1,0 +1,21 @@
+#
+# CSE186 Assignment 6
+#
+
+openapi: '3.0.3'
+
+info:
+  description: CSE186 Assignment 6
+  version: 0.2.0
+  title: CSE186 Assignment 6
+
+servers:
+  - url: http://localhost:3010/api
+
+paths:
+  /v0/mail:
+    get:
+      description: Returns all EMail
+      responses:
+        200:
+          description: All email as ? (you fill in the blanks)

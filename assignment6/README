@@ -1,0 +1,27 @@
+To install node packages:
+
+  $ npm install
+
+To start the database: 
+
+  $ docker compose up -d
+
+To run the Web App: 
+
+  $ npm start
+
+To run tests and genberate a coverage report: 
+
+  $ npm test
+
+To run the linter: 
+
+  $ npm run lint
+
+To generate a Canvas submission ZIP: 
+
+  $ npm run zip
+
+To stop the database: 
+
+  $ docker compose down
