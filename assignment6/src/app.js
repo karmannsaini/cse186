@@ -16,6 +16,9 @@ import path from 'node:path';
 import OpenApiValidator from 'express-openapi-validator';
 import {fileURLToPath} from 'node:url';
 
+// Import the router created in the route folder
+import mailRouter from './route/mail.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -36,10 +39,10 @@ app.use(
     }),
 );
 
-// Your routes go here; however, do NOT write then inline.
-// Create route handler modules in the "route" foleder and delegate
-// to their exports. Those handlers should delegate to models in
-// the "model" folder.
+// Mount the mail router at the correct path
+app.use('/api/v0/mail', mailRouter);
+
+// Universal error handler.
 
 app.use((err, req, res, next) => {
   res.status(err.status).json({

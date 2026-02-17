@@ -3,19 +3,120 @@
 #
 
 openapi: '3.0.3'
-
 info:
   description: CSE186 Assignment 6
   version: 0.2.0
   title: CSE186 Assignment 6
-
 servers:
   - url: http://localhost:3010/api
-
 paths:
   /v0/mail:
     get:
-      description: Returns all EMail
+      summary: Returns mailboxes
+      parameters:
+        - name: mailbox
+          in: query
+          required: false
+          schema: { type: string }
+        - name: from
+          in: query
+          required: false
+          schema: { type: string }
       responses:
         200:
-          description: All email as ? (you fill in the blanks)
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Mailbox' }
+        404:
+          description: Not Found
+    post:
+      summary: Create mail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MailInput' }
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Mail' }
+        400:
+          description: Bad Request
+  /v0/mail/{id}:
+    get:
+      summary: Get mail by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Mail' }
+        404:
+          description: Not Found
+    put:
+      summary: Move mail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - name: mailbox
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        204:
+          description: No Content
+        404:
+          description: Not Found
+        409:
+          description: Conflict
+components:
+  schemas:
+    UUID:
+      type: string
+      pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+    Person:
+      type: object
+      required: [name, email]
+      additionalProperties: false
+      properties:
+        name: { type: string }
+        email: { type: string, format: email }
+    Mail:
+      type: object
+      required: [id, from, to, subject, sent, received]
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        from: { $ref: '#/components/schemas/Person' }
+        to: { $ref: '#/components/schemas/Person' }
+        subject: { type: string }
+        sent: { type: string, format: date-time }
+        received: { type: string, format: date-time }
+        content: { type: string }
+    MailInput:
+      type: object
+      required: [to, subject, content]
+      additionalProperties: false
+      properties:
+        to: { $ref: '#/components/schemas/Person' }
+        subject: { type: string }
+        content: { type: string }
+    Mailbox:
+      type: object
+      required: [name, mail]
+      properties:
+        name: { type: string }
+        mail:
+          type: array
+          items: { $ref: '#/components/schemas/Mail' }
