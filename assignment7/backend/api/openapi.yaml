@@ -1,0 +1,17 @@
+#
+# CSE186 Assignment 7 Backend
+#
+
+openapi: '3.0.3'
+
+info:
+  description: CSE186 Assignment 7 Backend
+  version: 0.2.0
+  title: CSE186 Assignment 7 Backend
+
+servers:
+  - url: http://localhost:3010/api/v0
+
+paths:
+  # your paths go here
+ 
