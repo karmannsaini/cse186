@@ -9,15 +9,19 @@
 #######################################################################
 */
 
+import CssBaseline from '@mui/material/CssBaseline';
+import List from './mailbox/List';
+
 /**
  * Simple component with no state.
  * @returns {object} JSX
  */
 function App() {
   return (
-    <pre>
-      CSE186 Assignment 7 ( Your UI Goes Here )
-    </pre>
+    <div>
+      <CssBaseline />
+      <List />
+    </div>
   );
 }
 

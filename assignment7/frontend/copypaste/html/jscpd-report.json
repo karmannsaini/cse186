@@ -1,0 +1,161 @@
+{
+  "statistics": {
+    "detectionDate": "2026-02-20T20:45:41.827Z",
+    "formats": {
+      "jsx": {
+        "sources": {
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/validity.test.jsx": {
+            "lines": 141,
+            "tokens": 1201,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/MailboxList.test.jsx": {
+            "lines": 19,
+            "tokens": 204,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/ListItem.jsx": {
+            "lines": 18,
+            "tokens": 123,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/List.jsx": {
+            "lines": 22,
+            "tokens": 197,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/main.jsx": {
+            "lines": 24,
+            "tokens": 66,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/App.jsx": {
+            "lines": 23,
+            "tokens": 59,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 247,
+          "tokens": 1850,
+          "sources": 6,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "javascript": {
+        "sources": {
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/setupTests.js": {
+            "lines": 9,
+            "tokens": 94,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/ListItem.jsx": {
+            "lines": 0,
+            "tokens": 3,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/List.jsx": {
+            "lines": 0,
+            "tokens": 9,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 9,
+          "tokens": 106,
+          "sources": 3,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 256,
+      "tokens": 1956,
+      "sources": 9,
+      "clones": 0,
+      "duplicatedLines": 0,
+      "duplicatedTokens": 0,
+      "percentage": 0,
+      "percentageTokens": 0,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [],
+  "filename": "H:\\School\\CSE186\\assignment7\\frontend\\node_modules\\@jscpd\\html-reporter\\dist\\templates\\main.pug"
+}

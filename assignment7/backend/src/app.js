@@ -17,6 +17,7 @@ import path from 'node:path';
 import OpenApiValidator from 'express-openapi-validator';
 import {fileURLToPath} from 'node:url';
 import http from 'http';
+import * as Mailbox from './mailbox';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,6 +46,8 @@ app.use(
     }),
 );
 
+app.get('/api/v0/mailbox', Mailbox.getMailboxes);
+
 // Your routes go here; however, do NOT write then inline.
 // Create additional modules and delegate to their exports.
 
@@ -52,7 +55,7 @@ app.use((err, req, res, next) => {
   res.status(err.status).json({
     message: err.message,
     errors: err.errors,
-    status: err.status,
+    status: err.status || 500,
   });
 });
 

@@ -57,4 +57,3 @@ export async function reset() {
 export function close() {
   pool.end();
 };
-

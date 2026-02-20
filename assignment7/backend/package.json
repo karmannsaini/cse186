@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "repository": "none",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@vitest/coverage-v8": "*",
     "eslint": "*",
     "eslint-config-google": "*",
