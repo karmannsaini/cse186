@@ -1,63 +1,35 @@
-/*
-#######################################################################
-#
-# Copyright (C) 2020-2025 David C. Harrison. All right reserved.
-#
-# You may not use, distribute, publish, or modify this code without
-# the express written permission of the copyright holder.
-#
-#######################################################################
-*/
 import express from 'express';
 import cors from 'cors';
-import yaml from 'js-yaml';
-import swaggerUi from 'swagger-ui-express';
-import fs from 'fs';
-import path from 'node:path';
-import OpenApiValidator from 'express-openapi-validator';
-import {fileURLToPath} from 'node:url';
-import http from 'http';
-import * as Mailbox from './mailbox';
+import path from 'path';
+import {fileURLToPath} from 'url';
+import * as OpenApiValidator from 'express-openapi-validator';
+import * as Mailbox from './mailbox.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
-
-const apiSpec = path.join(__dirname, '../api/openapi.yaml');
-
-const apidoc = yaml.load(fs.readFileSync(apiSpec, 'utf8'));
-app.use('/api/v0/docs', swaggerUi.serve, swaggerUi.setup(apidoc));
-
-// Allow connections from a non common origin so dev and preview
-// UIs can connect
-app.use(cors(
-    {origin: 'http://localhost:3000'},
-    {origin: 'http://localhost:4173'},
-));
 
 app.use(
     OpenApiValidator.middleware({
-      apiSpec: apiSpec,
+      apiSpec: path.join(__dirname, '../api/openapi.yaml'),
       validateRequests: true,
       validateResponses: true,
     }),
 );
 
 app.get('/api/v0/mailbox', Mailbox.getMailboxes);
-
-// Your routes go here; however, do NOT write then inline.
-// Create additional modules and delegate to their exports.
+app.get('/api/v0/mail', Mailbox.getMail);
+app.get('/api/v0/mail/:id', Mailbox.getMailById);
+app.put('/api/v0/mail/:id', Mailbox.moveMail);
 
 app.use((err, req, res, next) => {
-  res.status(err.status).json({
+  res.status(err.status || 500).json({
     message: err.message,
     errors: err.errors,
-    status: err.status || 500,
   });
 });
 
-const server = http.createServer(app);
-export default server;
+export default app;
