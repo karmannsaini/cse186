@@ -1,7 +1,7 @@
 /*
 #######################################################################
 #
-# Copyright (C) 2020-2025 David C. Harrison. All right reserved.
+# Copyright (C) 2020-2026  David C. Harrison. All right reserved.
 #
 # You may not use, distribute, publish, or modify this code without
 # the express written permission of the copyright holder.
@@ -27,12 +27,12 @@ test('Websocket Updates', async () => {
   await mailExistsIn(page,
       'Judon Cromar',
       'Organized dynamic array',
-      '2024');
+      'Nov 03');
   await clickOn(page,
-      '::-p-aria(Delete mail from Judon Cromar received 2024)');
+      '::-p-aria(Delete mail from Judon Cromar received Nov 03)');
   await pages[2].bringToFront();
   await mailExistsIn(tab,
       'Judon Cromar to CSE186 Student',
       'Organized dynamic array',
-      '2024');
+      'Nov 03');
 });

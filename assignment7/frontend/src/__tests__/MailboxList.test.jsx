@@ -1,21 +1,48 @@
-import {it, beforeAll, afterAll, afterEach} from 'vitest';
 import {render, screen} from '@testing-library/react';
-import {http, HttpResponse} from 'msw';
-import {setupServer} from 'msw/node';
-import List from '../mailbox/List';
+import {describe, it, expect, vi} from 'vitest';
+// import React from 'react';
+import {MailContext} from '../MailContext';
+import MailboxList from '../mailbox/List';
 
-const server = setupServer(
-    http.get('http://localhost:3010/api/v0/mailbox', () => {
-      return HttpResponse.json(['Inbox', 'Sent', 'Trash']);
-    }),
-);
+describe('MailboxList Component', () => {
+  it('Displays correct Mailbox list', () => {
+    const mockContext = {
+      mailboxes: [{id: '1', name: 'Inbox'}, {id: '2', name: 'Sent'}],
+      mailbox: 'Inbox',
+      setMailbox: vi.fn(),
+    };
 
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+    render(
+        <MailContext.Provider value={mockContext}>
+          <MailboxList />
+        </MailContext.Provider>,
+    );
 
-it('Displays correct Mailbox list', async () => {
-  render(<List />);
-  await screen.findByLabelText('Mailbox List');
-  await screen.findByText('Inbox');
+    expect(screen.getByLabelText('Mailbox List')).toBeInTheDocument();
+
+    expect(screen.getByText('Inbox')).toBeInTheDocument();
+    expect(screen.getByText('Sent')).toBeInTheDocument();
+  });
+
+  it('Calls setMailbox when a mailbox is clicked', () => {
+    const setMailboxMock = vi.fn();
+    const mockContext = {
+      mailboxes: [{id: '1', name: 'Inbox'}, {id: '2', name: 'Sent'}],
+      mailbox: 'Inbox',
+      setMailbox: setMailboxMock,
+    };
+
+    render(
+        <MailContext.Provider value={mockContext}>
+          <MailboxList />
+        </MailContext.Provider>,
+    );
+
+    // Click the "Sent" folder
+    const sentButton = screen.getByText('Sent');
+    sentButton.click();
+
+    // Verify the state updater was called
+    expect(setMailboxMock).toHaveBeenCalledWith('Sent');
+  });
 });

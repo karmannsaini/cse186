@@ -1,7 +1,7 @@
 /*
 #######################################################################
 #
-# Copyright (C) 2020-2025 David C. Harrison. All right reserved.
+# Copyright (C) 2020-2026 David C. Harrison. All right reserved.
 #
 # You may not use, distribute, publish, or modify this code without
 # the express written permission of the copyright holder.
@@ -18,19 +18,37 @@ import {it, test, expect} from 'vitest';
 import {render} from '@testing-library/react';
 
 import fs from 'fs';
+import path from 'path';
+
 import {readdir} from 'node:fs/promises';
 import strip from 'strip-comments';
 
 import App from '../App';
 
+/**
+ * @param {string} dir folder
+ * @param {object} callback function
+ */
+function listDirectory(dir, callback) {
+  fs.readdirSync(dir).forEach((f) => {
+    const dirPath = path.join(dir, f);
+    const isDirectory = fs.statSync(dirPath).isDirectory();
+    if (isDirectory) {
+      listDirectory(dirPath, callback);
+    } else {
+      callback(dirPath);
+    }
+  });
+}
+
 const contains = async (text, trim = false) => {
   let cnt = 0;
-  const files = await readdir('src', {recursive: true});
-  for (const file of files) {
-    if ((!file.startsWith(`__tests__`)) &&
-        (!file.startsWith(`main.jsx`)) &&
-        ((file.endsWith(`.jsx`) || file.endsWith(`.js`)))) {
-      const data = fs.readFileSync(`src/${file}`, {encoding: 'utf8'});
+  listDirectory('src', (file) => {
+    if ((!file.includes(`__tests__`)) &&
+        (!file.startsWith(`src${path.sep}main.jsx`)) &&
+        ((file.endsWith(`.jsx`) || file.endsWith(`.js`)))
+    ) {
+      const data = fs.readFileSync(`${file}`, {encoding: 'utf8'});
       let src = strip(data).replace(/(\r\n|\n|\r)/gm, '');
       if (trim) {
         src = src.replaceAll(' ', '');
@@ -39,22 +57,27 @@ const contains = async (text, trim = false) => {
         cnt++;
       }
     }
-  }
+  });
   return cnt;
 };
 
 const testing = async (text) => {
   let cnt = 0;
-  const files = await readdir('src/__tests__', {recursive: true});
-  for (const file of files) {
-    if (!file.startsWith(`validity.test`)) {
-      const data = fs.readFileSync(`src/__tests__/${file}`, {encoding: 'utf8'});
-      const src = strip(data).replace(/(\r\n|\n|\r)/gm, '');
-      if (src.includes(text)) {
-        cnt++;
+  listDirectory('src', (file) => {
+    if (!file.includes(`src${path.sep}__tests__${path.sep}validity.test`)) {
+      if (
+        file.includes(`__tests__`) ||
+        file.includes(`.test.`) ||
+        file.includes(`.spec.`)
+      ) {
+        const data = fs.readFileSync(`${file}`, {encoding: 'utf8'});
+        const src = strip(data).replace(/(\r\n|\n|\r)/gm, '');
+        if (src.includes(text)) {
+          cnt++;
+        }
       }
     }
-  }
+  });
   return cnt;
 };
 
