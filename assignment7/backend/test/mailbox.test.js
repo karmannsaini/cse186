@@ -125,3 +125,28 @@ test('PUT /api/v0/mail/:id handles 500 Server Error', async () => {
   const res = await request.put(`/api/v0/mail/${id}?mailbox=Trash`);
   expect(res.status).toBe(500);
 });
+
+test('GET /api/v0/mail/:id returns full email object (200)', async () => {
+  const listRes = await request.get('/api/v0/mail?mailbox=Inbox');
+  const validId = listRes.body[0].id;
+  const res = await request.get(`/api/v0/mail/${validId}`);
+  expect(res.status).toBe(200);
+  expect(res.body).toHaveProperty('content');
+});
+
+test('GET /api/v0/mail/:id with invalid ID returns 404', async () => {
+  const fakeId = '00000000-0000-0000-0000-000000000000';
+  const res = await request.get(`/api/v0/mail/${fakeId}`);
+  // 404 branch
+  expect(res.status).toBe(404);
+});
+
+test('GET /api/v0/mail/:id handles 500 Server Error', async () => {
+  const spy = vi.spyOn(srcDb, 'selectMailById').mockImplementation(() => {
+    throw new Error('Database Failure');
+  });
+
+  const res = await request.get('/api/v0/mail/123');
+  expect(res.status).toBe(500);
+  spy.mockRestore();
+});

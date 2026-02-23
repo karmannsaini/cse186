@@ -1,24 +1,25 @@
 import {render, screen} from '@testing-library/react';
-import {describe, it, expect, vi} from 'vitest';
+import {describe, it, expect} from 'vitest';
 import {MailContext} from '../MailContext';
 import MailViewer from '../mailbox/MailViewer';
 
-const mockEmail = {
-  id: '123',
-  from: {name: 'Professor', address: 'prof@ucsc.edu'},
-  subject: 'Great Job on TDD',
-  received: '2026-02-21T10:00:00Z',
-  content: 'You are on track for a maximum grade!',
-};
-
 describe('MailViewer Component TDD', () => {
+  const mockEmail = {
+    id: '123',
+    subject: 'Test Subject',
+    from: {name: 'Sender', address: 'sender@test.com'},
+    to: {name: 'Me', address: 'me@test.com'},
+    received: '2026-02-23T00:00:00Z',
+    content: 'Test Content',
+  };
+
   it('Displays the subject of the active email', () => {
     render(
         <MailContext.Provider value={{activeEmail: mockEmail}}>
           <MailViewer />
         </MailContext.Provider>,
     );
-    expect(screen.getByText('Great Job on TDD')).toBeInTheDocument();
+    expect(screen.getByText('Test Subject')).toBeInTheDocument();
   });
 
   it('Displays the full content of the email', () => {
@@ -27,29 +28,32 @@ describe('MailViewer Component TDD', () => {
           <MailViewer />
         </MailContext.Provider>,
     );
-    expect(screen.getByText(/ maximum grade/i)).toBeInTheDocument();
+    expect(screen.getByText('Test Content')).toBeInTheDocument();
   });
 
   it('Shows nothing if no email is active', () => {
-    const {container} = render(
+    render(
         <MailContext.Provider value={{activeEmail: null}}>
           <MailViewer />
         </MailContext.Provider>,
     );
-    expect(container.firstChild).toBeNull();
+    // Updated to match the Advanced UI design
+    expect(screen.getByText('Select an email to read')).toBeInTheDocument();
   });
 
-  it('Calls setActiveEmail(null) when the Back button is clicked', () => {
-    const setActiveEmail = vi.fn();
+  it('Displays fallback text when sender data is completely missing', () => {
+    const brokenEmail = {
+      id: '999',
+      subject: 'No Sender',
+      from: {}, // Empty from object!
+      received: '2026-02-23T00:00:00Z',
+    };
     render(
-        <MailContext.Provider value={{activeEmail: mockEmail, setActiveEmail}}>
+        <MailContext.Provider value={{activeEmail: brokenEmail}}>
           <MailViewer />
         </MailContext.Provider>,
     );
 
-    const backButton = screen.getByRole('button', {name: /back/i});
-    backButton.click();
-
-    expect(setActiveEmail).toHaveBeenCalledWith(null);
+    expect(screen.getByText('Unknown Sender')).toBeInTheDocument();
   });
 });

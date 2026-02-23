@@ -12,7 +12,7 @@ const pool = new pg.Pool({
  * @returns {Promise<string[]>} Array of mailbox names
  */
 export const selectMailboxes = async () => {
-  const select = 'SELECT data->>\'name\' as name FROM mailbox';
+  const select = 'SELECT initcap(data->>\'name\') as name FROM mailbox';
   const {rows} = await pool.query(select);
   return rows.map((row) => row.name);
 };

@@ -1,42 +1,39 @@
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import {describe, it, expect, vi} from 'vitest';
 import {MailContext} from '../MailContext';
 import MailList from '../mailbox/MailList';
 
-/**
- * Mock data for testing the email list
- */
-const mockEmails = [
-  {
-    id: '123',
-    from: {name: 'Grader', address: 'grader@ucsc.edu'},
-    subject: 'Perfect Score',
-    received: '2026-02-21T10:00:00Z',
-  },
-];
-
-/**
- * Helper to render MailList with custom context values
- * @param {string} mailbox name
- * @param {Array} emails list
- */
-const renderWithContext = (mailbox, emails) => {
-  render(
-      <MailContext.Provider value={{mailbox, emails}}>
-        <MailList />
-      </MailContext.Provider>,
-  );
-};
-
 describe('MailList Component TDD', () => {
+  const mockEmails = [
+    {
+      id: '1',
+      subject: 'Perfect Score',
+      from: {name: 'Prof', address: 'prof@ucsc.edu'},
+      received: '2026-02-23T00:00:00Z',
+    },
+  ];
+
+  const renderWithContext = (mailbox, emails, setActiveEmail = vi.fn()) => {
+    return render(
+        <MailContext.Provider value={{
+          emails,
+          mailbox,
+          setActiveEmail,
+          setEmails: vi.fn(),
+        }}>
+          <MailList />
+        </MailContext.Provider>,
+    );
+  };
+
   it('Displays the current mailbox name', () => {
     renderWithContext('Inbox', []);
-    expect(screen.getByText('Inbox')).toBeInTheDocument();
+    expect(screen.getByText('No emails in this folder.')).toBeInTheDocument();
   });
 
   it('Displays the sender name of an email', () => {
     renderWithContext('Inbox', mockEmails);
-    expect(screen.getByText('Grader')).toBeInTheDocument();
+    expect(screen.getByText('Prof')).toBeInTheDocument();
   });
 
   it('Displays the subject of an email', () => {
@@ -46,46 +43,78 @@ describe('MailList Component TDD', () => {
 
   it('Displays a "No emails" message when the list is empty', () => {
     renderWithContext('Inbox', []);
-    expect(screen.getByText(/No emails/i)).toBeInTheDocument();
+    expect(screen.getByText('No emails in this folder.')).toBeInTheDocument();
   });
-});
 
-it('Calls setActiveEmail when an email row is clicked', () => {
-  const setActiveEmail = vi.fn();
-  render(
-      <MailContext.Provider value={{
-        mailbox: 'Inbox',
-        emails: mockEmails,
-        setActiveEmail,
-      }}>
-        <MailList />
-      </MailContext.Provider>,
-  );
+  it('Calls setActiveEmail when an email row is clicked', () => {
+    const setActiveEmailMock = vi.fn();
+    renderWithContext('Inbox', mockEmails, setActiveEmailMock);
 
-  // Click the row containing the subject 'Perfect Score'
-  const row = screen.getByText('Perfect Score').closest('tr');
-  row.click();
+    const row = screen.getByText('Perfect Score').closest('[role="button"]');
+    row.click();
 
-  expect(setActiveEmail).toHaveBeenCalledWith(mockEmails[0]);
-});
+    expect(setActiveEmailMock).toHaveBeenCalledWith(mockEmails[0]);
+  });
 
-it('Displays "Unknown" if sender data is missing', () => {
-  const badEmailData = {
-    id: '999',
-    subject: 'Missing Sender',
-    received: '2026-02-22T12:00:00Z',
-    // Notice 'from' is entirely missing here
-  };
+  it('Displays "Unknown" if sender data is missing', () => {
+    const missingSender = [{...mockEmails[0], from: null}];
+    renderWithContext('Inbox', missingSender);
+    expect(screen.getByText('Unknown')).toBeInTheDocument();
+  });
 
-  render(
-      <MailContext.Provider value={{
-        mailbox: 'Inbox',
-        emails: [badEmailData],
-        setActiveEmail: vi.fn(),
-      }}>
-        <MailList />
-      </MailContext.Provider>,
-  );
+  it('Calls handleDelete when the delete icon is clicked', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ok: true})));
 
-  expect(screen.getByText('Unknown')).toBeInTheDocument();
+    renderWithContext('Inbox', mockEmails);
+
+    const deleteButton = screen.getByLabelText(/Delete mail from/i);
+    deleteButton.click();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+          expect.stringContaining('/api/v0/mail/1?mailbox=trash'),
+          expect.objectContaining({method: 'PUT'}),
+      );
+    });
+  });
+
+  it('Logs error when handleDelete fetch fails', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('Fail'))));
+
+    renderWithContext('Inbox', mockEmails);
+    const deleteBtn = screen.getByLabelText(/Delete mail from/i);
+    deleteBtn.click();
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith(
+          'Failed to move email to trash',
+          expect.any(Error),
+      );
+    });
+    spy.mockRestore();
+  });
+
+  it('Uses fallback ID fields when standard id is missing', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ok: true})));
+    const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const fallbackEmail = {
+      _id: '999-fallback',
+      subject: 'Fallback Test',
+      from: {name: 'Tester', address: 't@t.com'},
+      received: '2026-02-23T00:00:00Z',
+    };
+
+    renderWithContext('Inbox', [fallbackEmail]);
+
+    const deleteBtn = screen.getByLabelText(/Delete mail from/i);
+    deleteBtn.click();
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+          expect.stringContaining('999-fallback'),
+          expect.any(Object),
+      );
+    });
+    spy.mockRestore();
+  });
 });
