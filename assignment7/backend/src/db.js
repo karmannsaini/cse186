@@ -1,19 +1,31 @@
 import pg from 'pg';
+import dotenv from 'dotenv';
 
-const pool = new pg.Pool({
-  host: process.env.POSTGRES_HOST || 'localhost',
-  port: process.env.POSTGRES_PORT || 5432,
-  database: process.env.POSTGRES_DB || 'postgres',
-  user: process.env.POSTGRES_USER || 'postgres',
-  password: process.env.POSTGRES_PASSWORD || 'postgres',
-});
+dotenv.config();
+
+// Don't create the pool immediately!
+let pool;
+
+// Lazy-load the pool so it grabs the environment variables AFTER tests set them
+const getPool = () => {
+  if (!pool) {
+    pool = new pg.Pool({
+      host: process.env.POSTGRES_HOST,
+      port: process.env.POSTGRES_PORT,
+      database: process.env.POSTGRES_DB,
+      user: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+    });
+  }
+  return pool;
+};
 
 /**
  * @returns {Promise<string[]>} Array of mailbox names
  */
 export const selectMailboxes = async () => {
   const select = 'SELECT initcap(data->>\'name\') as name FROM mailbox';
-  const {rows} = await pool.query(select);
+  const {rows} = await getPool().query(select);
   return rows.map((row) => row.name);
 };
 
@@ -28,7 +40,7 @@ export const selectMail = async (mailbox) => {
            WHERE initcap(mb.data->>'name') = initcap($1)`,
     values: [mailbox],
   };
-  const {rows} = await pool.query(query);
+  const {rows} = await getPool().query(query);
   return rows.map((row) => {
     const email = {...row.data};
     email.id = row.id;
@@ -46,7 +58,7 @@ export const selectMailById = async (id) => {
     text: 'SELECT id, data FROM mail WHERE id = $1',
     values: [id],
   };
-  const {rows} = await pool.query(query);
+  const {rows} = await getPool().query(query);
   if (rows.length === 0) return null;
   const email = {...rows[0].data};
   email.id = rows[0].id;
@@ -65,6 +77,6 @@ export const moveMail = async (id, mailboxName) => {
            ) WHERE id = $2`,
     values: [mailboxName, id],
   };
-  const {rowCount} = await pool.query(query);
+  const {rowCount} = await getPool().query(query);
   return rowCount;
 };

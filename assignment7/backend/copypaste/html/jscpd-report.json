@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2026-02-23T20:54:40.861Z",
+    "detectionDate": "2026-02-24T04:22:04.700Z",
     "formats": {
       "javascript": {
         "sources": {
@@ -16,9 +16,21 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "H:/School/CSE186/assignment7/backend/src/notif.js": {
+            "lines": 16,
+            "tokens": 130,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "H:/School/CSE186/assignment7/backend/src/mailbox.js": {
-            "lines": 68,
-            "tokens": 519,
+            "lines": 85,
+            "tokens": 674,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -41,8 +53,8 @@
             "newClones": 0
           },
           "H:/School/CSE186/assignment7/backend/src/app.js": {
-            "lines": 34,
-            "tokens": 305,
+            "lines": 49,
+            "tokens": 420,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -54,9 +66,9 @@
           }
         },
         "total": {
-          "lines": 193,
-          "tokens": 1396,
-          "sources": 4,
+          "lines": 241,
+          "tokens": 1796,
+          "sources": 5,
           "clones": 0,
           "duplicatedLines": 0,
           "duplicatedTokens": 0,
@@ -68,9 +80,9 @@
       }
     },
     "total": {
-      "lines": 193,
-      "tokens": 1396,
-      "sources": 4,
+      "lines": 241,
+      "tokens": 1796,
+      "sources": 5,
       "clones": 0,
       "duplicatedLines": 0,
       "duplicatedTokens": 0,

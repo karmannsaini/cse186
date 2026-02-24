@@ -29,17 +29,15 @@ function MailList() {
 
   // Format the primary text based on mailbox
   const getPrimaryText = (email, currentMailbox) => {
-    const fromName = email.from?.name || 'Unknown';
-    const toName = email.to?.name || 'Unknown';
+    const fromName = email.from?.name || email.from || 'Unknown';
+    const toName = email.to?.name || email.to || 'Unknown';
 
     if (currentMailbox === 'Sent') return toName;
-    if (currentMailbox === 'Trash') {
-      return fromName + ' to ' + toName;
-    }
-    return fromName;
+    if (currentMailbox === 'Trash') return fromName + ' to ' + toName;
+    return fromName; // Inbox default
   };
 
-  // Format the  arialabel
+  // Format the aria-label safely keeping it under 80 chars
   const getDeleteLabel = (email, currentMailbox) => {
     const dateStr = formatDate(email.received || email.sent);
 
@@ -55,15 +53,13 @@ function MailList() {
   const handleDelete = async (e, emailObj) => {
     e.stopPropagation();
 
-    console.log('Email Object:', emailObj);
-
-    setEmails(emails.filter((item) => item !== emailObj));
-
     const targetId = emailObj.id || emailObj.mail?.id || emailObj._id;
 
     try {
       const url = `http://localhost:3010/api/v0/mail/${targetId}?mailbox=trash`;
       await fetch(url, {method: 'PUT'});
+      // Ensure the DB update finishes BEFORE removing from the UI!
+      setEmails(emails.filter((item) => item !== emailObj));
     } catch (err) {
       console.error('Failed to move email to trash', err);
     }
@@ -96,12 +92,12 @@ function MailList() {
               </ListItemIcon>
 
               <ListItemText
-                primary={getPrimaryText(email, mailbox)} // Replaced with helper
+                primary={getPrimaryText(email, mailbox)}
                 secondary={email.subject}
               />
 
               <Typography variant="body2" color="text.secondary">
-                {formatDate(email.received)} {/* Replaced with helper */}
+                {formatDate(email.received || email.sent)}
               </Typography>
             </ListItemButton>
           ))}

@@ -26,7 +26,7 @@ export const MailProvider = ({children}) => {
         .catch(() => {});
   }, []);
 
-  useEffect(() => {
+  const fetchMyEmails = useCallback(() => {
     fetch(`http://localhost:3010/api/v0/mail?mailbox=${mailbox}`)
         .then((res) => {
           if (!res.ok) {
@@ -38,20 +38,12 @@ export const MailProvider = ({children}) => {
         .catch(() => {});
   }, [mailbox]);
 
-  const fetchMyEmails = useCallback(() => {
-    fetch(`http://localhost:3010/api/v0/mail?mailbox=${mailbox}`)
-        .then((res) => {
-          if (!res.ok) throw new Error();
-          return res.json();
-        })
-        .then(setEmails)
-        .catch((err) => console.error(err));
-  }, [mailbox]);
-
+  // Initial load and mailbox change listener
   useEffect(() => {
     fetchMyEmails();
   }, [fetchMyEmails]);
 
+  // WebSocket Listener
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:3010');
     ws.onmessage = (event) => {
@@ -59,7 +51,6 @@ export const MailProvider = ({children}) => {
         fetchMyEmails();
       }
     };
-
     return () => ws.close();
   }, [fetchMyEmails]);
 

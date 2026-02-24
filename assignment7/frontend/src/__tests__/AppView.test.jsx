@@ -4,7 +4,6 @@ import App from '../App';
 
 describe('App View Logic TDD', () => {
   beforeEach(() => {
-    // Mock matchMedia so MUI useMediaQuery works in tests
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
       value: vi.fn().mockImplementation((query) => ({
@@ -23,7 +22,8 @@ describe('App View Logic TDD', () => {
   it('Initially displays the MailList (Inbox)', async () => {
     render(<App />);
     await waitFor(() => {
-      expect(screen.getByText('No emails in this folder.')).toBeInTheDocument();
+      expect(screen.getByText('No emails in this folder.'))
+          .toBeInTheDocument();
     });
   });
 
@@ -36,27 +36,25 @@ describe('App View Logic TDD', () => {
 
   it('Covers handleBack function on mobile view', async () => {
     vi.stubGlobal('fetch', vi.fn((url) => {
-      if (url.includes('/mailbox')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(['Inbox']),
-        });
+      const isBox = url.includes('/mailbox');
+      const isId = url.includes('/mail/1');
+
+      if (isBox) {
+        return Promise.resolve({ok: true, json: async () => ['Inbox']});
       }
-      if (url.includes('/mail/1')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({
-            id: '1',
-            subject: 'Mobile Test',
-            content: 'Body',
-            from: {name: 'Sender', address: 'a@b.com'},
-          }),
-        });
+
+      if (isId) {
+        const fullBody = {
+          id: '1',
+          subject: 'Mobile Test',
+          content: 'Body',
+          from: {name: 'Sender', address: 'a@b.com'},
+        };
+        return Promise.resolve({ok: true, json: async () => fullBody});
       }
-      return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([{id: '1', subject: 'Mobile Test'}]),
-      });
+
+      const listBody = [{id: '1', subject: 'Mobile Test'}];
+      return Promise.resolve({ok: true, json: async () => listBody});
     }));
 
     render(<App />);
