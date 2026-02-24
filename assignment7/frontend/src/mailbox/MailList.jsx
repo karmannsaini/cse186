@@ -21,13 +21,35 @@ function MailList() {
     mailbox,
   } = useContext(MailContext);
 
-  const formatShortDate = (dateString) => {
-    const date = new Date(dateString);
-    if (isNaN(date)) return 'Unknown';
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: '2-digit',
-    });
+  const formatDate = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return date.toLocaleDateString('en-US', {month: 'short', day: '2-digit'});
+  };
+
+  // Format the primary text based on mailbox
+  const getPrimaryText = (email, currentMailbox) => {
+    const fromName = email.from?.name || 'Unknown';
+    const toName = email.to?.name || 'Unknown';
+
+    if (currentMailbox === 'Sent') return toName;
+    if (currentMailbox === 'Trash') {
+      return fromName + ' to ' + toName;
+    }
+    return fromName;
+  };
+
+  // Format the  arialabel
+  const getDeleteLabel = (email, currentMailbox) => {
+    const dateStr = formatDate(email.received || email.sent);
+
+    if (currentMailbox === 'Sent') {
+      const toName = email.to?.name || email.to || 'Unknown';
+      return 'Delete mail to ' + toName + ' sent ' + dateStr;
+    }
+
+    const fromName = email.from?.name || email.from || 'Unknown';
+    return 'Delete mail from ' + fromName + ' received ' + dateStr;
   };
 
   const handleDelete = async (e, emailObj) => {
@@ -55,63 +77,34 @@ function MailList() {
         </Box>
       ) : (
         <List sx={{width: '100%', bgcolor: 'background.paper', p: 0}}>
-          {emails.map((email) => {
-            const fromName = (email.from && email.from.name) || 'Unknown';
-            const dateStr = formatShortDate(email.received);
-            const ariaLabel = `Delete mail from ${fromName} ` +
-                              `received ${dateStr}`;
-
-            return (
-              <ListItemButton
-                key={email.id}
-                onClick={() => setActiveEmail(email)}
-                divider
-                sx={{py: 1.5}}
-              >
-                {mailbox.toLowerCase() !== 'trash' && (
-                  <ListItemIcon sx={{minWidth: 40}}>
-                    <IconButton
-                      edge="start"
-                      aria-label={ariaLabel}
-                      onClick={(e) => handleDelete(e, email)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemIcon>
+          {emails.map((email) => (
+            <ListItemButton
+              key={email.id}
+              divider
+              onClick={() => setActiveEmail(email)}
+            >
+              <ListItemIcon>
+                {mailbox !== 'Trash' && (
+                  <IconButton
+                    edge="start"
+                    aria-label={getDeleteLabel(email, mailbox)}
+                    onClick={(e) => handleDelete(e, email)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 )}
+              </ListItemIcon>
 
-                <ListItemText
-                  primary={
-                    <Typography variant="body1" sx={{fontWeight: 500}}>
-                      {fromName}
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 1,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {email.subject}
-                    </Typography>
-                  }
-                  sx={{m: 0}}
-                />
-                <Typography
-                  variant="body2"
-                  color="text.primary"
-                  sx={{ml: 2, minWidth: '60px', textAlign: 'right'}}
-                >
-                  {dateStr}
-                </Typography>
-              </ListItemButton>
-            );
-          })}
+              <ListItemText
+                primary={getPrimaryText(email, mailbox)} // Replaced with helper
+                secondary={email.subject}
+              />
+
+              <Typography variant="body2" color="text.secondary">
+                {formatDate(email.received)} {/* Replaced with helper */}
+              </Typography>
+            </ListItemButton>
+          ))}
         </List>
       )}
     </Box>

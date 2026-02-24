@@ -1,4 +1,5 @@
 import * as db from './db.js';
+import {notify} from './notif.js';
 
 /**
  * GET /api/v0/mailbox
@@ -49,6 +50,8 @@ export const moveMail = async (req, res, next) => {
       return res.status(404).send('Email not found');
     }
 
+    notify();
+
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -63,6 +66,20 @@ export const getMailById = async (req, res, next) => {
       return res.status(404).send('Email not found');
     }
     res.status(200).json(mail);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const putMail = async (req, res, next) => {
+  try {
+    const rowCount = await db.moveMail(req.params.id, req.query.mailbox);
+    if (rowCount > 0) {
+      notify();
+      res.status(204).send();
+    } else {
+      res.status(404).send();
+    }
   } catch (err) {
     next(err);
   }

@@ -33,8 +33,12 @@ function MailboxList() {
             selected={mailbox === nameStr}
             onClick={() => setMailbox(nameStr)}
           >
-            <ListItemIcon>{getIcon(nameStr)}</ListItemIcon>
-            <ListItemText primary={nameStr} />
+            <ListItemIcon>
+              {getIcon(nameStr)}
+            </ListItemIcon>
+            <ListItemText
+              primary={nameStr}>
+            </ListItemText>
           </ListItemButton>
         );
       })}

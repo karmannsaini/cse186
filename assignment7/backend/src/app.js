@@ -4,6 +4,7 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 import * as OpenApiValidator from 'express-openapi-validator';
 import * as Mailbox from './mailbox.js';
+import {initStatus} from './notif.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,5 +32,19 @@ app.use((err, req, res, next) => {
     errors: err.errors,
   });
 });
+
+let server;
+const originalListen = app.listen.bind(app);
+app.listen = (...args) => {
+  server = originalListen(...args);
+  initStatus(server);
+  return server;
+};
+
+app.close = (callback) => {
+  if (server) {
+    server.close(callback);
+  }
+};
 
 export default app;

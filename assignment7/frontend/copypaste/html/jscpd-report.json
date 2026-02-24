@@ -1,12 +1,36 @@
 {
   "statistics": {
-    "detectionDate": "2026-02-20T20:45:41.827Z",
+    "detectionDate": "2026-02-23T20:54:30.238Z",
     "formats": {
       "jsx": {
         "sources": {
           "H:/School/CSE186/assignment7/frontend/src/__tests__/validity.test.jsx": {
-            "lines": 141,
-            "tokens": 1201,
+            "lines": 164,
+            "tokens": 1341,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/MailViewer.test.jsx": {
+            "lines": 58,
+            "tokens": 472,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/MailList.test.jsx": {
+            "lines": 119,
+            "tokens": 1093,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -17,8 +41,56 @@
             "newClones": 0
           },
           "H:/School/CSE186/assignment7/frontend/src/__tests__/MailboxList.test.jsx": {
-            "lines": 19,
-            "tokens": 204,
+            "lines": 74,
+            "tokens": 594,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/Integration.test.jsx": {
+            "lines": 128,
+            "tokens": 1340,
+            "sources": 1,
+            "clones": 7,
+            "duplicatedLines": 54,
+            "duplicatedTokens": 516,
+            "percentage": 42.19,
+            "percentageTokens": 38.51,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/AppView.test.jsx": {
+            "lines": 72,
+            "tokens": 694,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 8,
+            "duplicatedTokens": 96,
+            "percentage": 11.11,
+            "percentageTokens": 13.83,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/MailViewer.jsx": {
+            "lines": 77,
+            "tokens": 677,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/MailList.jsx": {
+            "lines": 120,
+            "tokens": 901,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -41,8 +113,20 @@
             "newClones": 0
           },
           "H:/School/CSE186/assignment7/frontend/src/mailbox/List.jsx": {
-            "lines": 22,
-            "tokens": 197,
+            "lines": 44,
+            "tokens": 396,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/Context.jsx": {
+            "lines": 19,
+            "tokens": 156,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -64,9 +148,21 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "H:/School/CSE186/assignment7/frontend/src/MailContext.jsx": {
+            "lines": 72,
+            "tokens": 574,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "H:/School/CSE186/assignment7/frontend/src/App.jsx": {
-            "lines": 23,
-            "tokens": 59,
+            "lines": 150,
+            "tokens": 1035,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -78,14 +174,14 @@
           }
         },
         "total": {
-          "lines": 247,
-          "tokens": 1850,
-          "sources": 6,
-          "clones": 0,
-          "duplicatedLines": 0,
-          "duplicatedTokens": 0,
-          "percentage": 0,
-          "percentageTokens": 0,
+          "lines": 1139,
+          "tokens": 9462,
+          "sources": 14,
+          "clones": 4,
+          "duplicatedLines": 31,
+          "duplicatedTokens": 306,
+          "percentage": 2.72,
+          "percentageTokens": 3.23,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -95,6 +191,66 @@
           "H:/School/CSE186/assignment7/frontend/src/__tests__/setupTests.js": {
             "lines": 9,
             "tokens": 94,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/MailViewer.test.jsx": {
+            "lines": 34,
+            "tokens": 265,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/MailList.test.jsx": {
+            "lines": 5,
+            "tokens": 19,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/__tests__/MailboxList.test.jsx": {
+            "lines": 54,
+            "tokens": 419,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/MailViewer.jsx": {
+            "lines": 41,
+            "tokens": 381,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/MailList.jsx": {
+            "lines": 55,
+            "tokens": 439,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -117,8 +273,44 @@
             "newClones": 0
           },
           "H:/School/CSE186/assignment7/frontend/src/mailbox/List.jsx": {
+            "lines": 5,
+            "tokens": 51,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/mailbox/Context.jsx": {
+            "lines": 1,
+            "tokens": 11,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/MailContext.jsx": {
             "lines": 0,
-            "tokens": 9,
+            "tokens": 3,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/frontend/src/App.jsx": {
+            "lines": 101,
+            "tokens": 703,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -130,9 +322,9 @@
           }
         },
         "total": {
-          "lines": 9,
-          "tokens": 106,
-          "sources": 3,
+          "lines": 305,
+          "tokens": 2388,
+          "sources": 11,
           "clones": 0,
           "duplicatedLines": 0,
           "duplicatedTokens": 0,
@@ -144,18 +336,163 @@
       }
     },
     "total": {
-      "lines": 256,
-      "tokens": 1956,
-      "sources": 9,
-      "clones": 0,
-      "duplicatedLines": 0,
-      "duplicatedTokens": 0,
-      "percentage": 0,
-      "percentageTokens": 0,
+      "lines": 1444,
+      "tokens": 11850,
+      "sources": 25,
+      "clones": 4,
+      "duplicatedLines": 31,
+      "duplicatedTokens": 306,
+      "percentage": 2.15,
+      "percentageTokens": 2.58,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
   },
-  "duplicates": [],
+  "duplicates": [
+    {
+      "format": "jsx",
+      "lines": 10,
+      "fragment": "));\n\n    render(<App />);\n\n    await waitFor(() => {\n      expect(screen.getByText('No emails in this folder.')).toBeInTheDocument();\n    });\n  });\n\n  it('Handles failed email list fetch (status 500)'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "H:/School/CSE186/assignment7/frontend/src/__tests__/Integration.test.jsx",
+        "start": 76,
+        "end": 85,
+        "startLoc": {
+          "line": 76,
+          "column": 2,
+          "position": 793
+        },
+        "endLoc": {
+          "line": 85,
+          "column": 47,
+          "position": 851
+        }
+      },
+      "secondFile": {
+        "name": "H:/School/CSE186/assignment7/frontend/src/__tests__/Integration.test.jsx",
+        "start": 56,
+        "end": 63,
+        "startLoc": {
+          "line": 56,
+          "column": 2,
+          "position": 571
+        },
+        "endLoc": {
+          "line": 63,
+          "column": 46,
+          "position": 627
+        }
+      }
+    },
+    {
+      "format": "jsx",
+      "lines": 5,
+      "fragment": "() => {\n    vi.stubGlobal('fetch', vi.fn((url) => {\n      if (url.includes('/mailbox')) {\n        return Promise.resolve({\n          ok: true, json: () => Promise.resolve(['Inbox']",
+      "tokens": 0,
+      "firstFile": {
+        "name": "H:/School/CSE186/assignment7/frontend/src/__tests__/Integration.test.jsx",
+        "start": 85,
+        "end": 89,
+        "startLoc": {
+          "line": 85,
+          "column": 2,
+          "position": 856
+        },
+        "endLoc": {
+          "line": 89,
+          "column": 2,
+          "position": 927
+        }
+      },
+      "secondFile": {
+        "name": "H:/School/CSE186/assignment7/frontend/src/__tests__/Integration.test.jsx",
+        "start": 6,
+        "end": 11,
+        "startLoc": {
+          "line": 6,
+          "column": 2,
+          "position": 65
+        },
+        "endLoc": {
+          "line": 11,
+          "column": 2,
+          "position": 137
+        }
+      }
+    },
+    {
+      "format": "jsx",
+      "lines": 11,
+      "fragment": "});\n      }\n      return Promise.reject(new Error('Network Error'));\n    }));\n    render(<App />);\n    await waitFor(() => {\n      expect(screen.getByText('No emails in this folder.')).toBeInTheDocument();\n    });\n  });\n\n  it('Handles failed full email body fetch'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "H:/School/CSE186/assignment7/frontend/src/__tests__/Integration.test.jsx",
+        "start": 93,
+        "end": 103,
+        "startLoc": {
+          "line": 93,
+          "column": 6,
+          "position": 965
+        },
+        "endLoc": {
+          "line": 103,
+          "column": 39,
+          "position": 1046
+        }
+      },
+      "secondFile": {
+        "name": "H:/School/CSE186/assignment7/frontend/src/__tests__/Integration.test.jsx",
+        "start": 73,
+        "end": 63,
+        "startLoc": {
+          "line": 73,
+          "column": 2,
+          "position": 768
+        },
+        "endLoc": {
+          "line": 63,
+          "column": 46,
+          "position": 627
+        }
+      }
+    },
+    {
+      "format": "jsx",
+      "lines": 9,
+      "fragment": ", async () => {\n    vi.stubGlobal('fetch', vi.fn((url) => {\n      if (url.includes('/mailbox')) {\n        return Promise.resolve({\n          ok: true,\n          json: () => Promise.resolve(['Inbox']),\n        });\n      }\n      if (url.includes('/mail/1'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "H:/School/CSE186/assignment7/frontend/src/__tests__/AppView.test.jsx",
+        "start": 37,
+        "end": 45,
+        "startLoc": {
+          "line": 37,
+          "column": 44,
+          "position": 344
+        },
+        "endLoc": {
+          "line": 45,
+          "column": 10,
+          "position": 440
+        }
+      },
+      "secondFile": {
+        "name": "H:/School/CSE186/assignment7/frontend/src/__tests__/Integration.test.jsx",
+        "start": 85,
+        "end": 92,
+        "startLoc": {
+          "line": 85,
+          "column": 47,
+          "position": 852
+        },
+        "endLoc": {
+          "line": 92,
+          "column": 17,
+          "position": 947
+        }
+      }
+    }
+  ],
   "filename": "H:\\School\\CSE186\\assignment7\\frontend\\node_modules\\@jscpd\\html-reporter\\dist\\templates\\main.pug"
 }

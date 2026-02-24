@@ -1,0 +1,85 @@
+{
+  "statistics": {
+    "detectionDate": "2026-02-23T20:54:40.861Z",
+    "formats": {
+      "javascript": {
+        "sources": {
+          "H:/School/CSE186/assignment7/backend/src/server.js": {
+            "lines": 22,
+            "tokens": 54,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/backend/src/mailbox.js": {
+            "lines": 68,
+            "tokens": 519,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/backend/src/db.js": {
+            "lines": 69,
+            "tokens": 518,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "H:/School/CSE186/assignment7/backend/src/app.js": {
+            "lines": 34,
+            "tokens": 305,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 193,
+          "tokens": 1396,
+          "sources": 4,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 193,
+      "tokens": 1396,
+      "sources": 4,
+      "clones": 0,
+      "duplicatedLines": 0,
+      "duplicatedTokens": 0,
+      "percentage": 0,
+      "percentageTokens": 0,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [],
+  "filename": "H:\\School\\CSE186\\assignment7\\backend\\node_modules\\@jscpd\\html-reporter\\dist\\templates\\main.pug"
+}

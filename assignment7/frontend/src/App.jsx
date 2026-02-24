@@ -30,6 +30,10 @@ const MainLayout = () => {
     setActiveEmail(null);
   };
 
+  // Logic moved here to satisfy the 80-char linter limit
+  const mailboxTitle = mailbox.charAt(0).toUpperCase() + mailbox.slice(1);
+  const title = `CSE186 Full Stack Mail - ${mailboxTitle}`;
+
   return (
     <Box sx={{display: 'flex', height: '100vh'}}>
       <CssBaseline />
@@ -39,11 +43,10 @@ const MainLayout = () => {
         position="fixed"
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          bgcolor: '#1976d2', // Standard MUI Blue matching the wireframe
+          bgcolor: '#1976d2',
         }}
       >
         <Toolbar>
-          {/* Hamburger menu for mobile */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -54,7 +57,6 @@ const MainLayout = () => {
             <MenuIcon />
           </IconButton>
 
-          {/* Back button when viewing an email on mobile */}
           {activeEmail && (
             <IconButton
               color="inherit"
@@ -67,7 +69,7 @@ const MainLayout = () => {
           )}
 
           <Typography variant="h6" noWrap component="div">
-            Kmail - {mailbox}
+            {title}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -77,7 +79,6 @@ const MainLayout = () => {
         component="nav"
         sx={{width: {sm: drawerWidth}, flexShrink: {sm: 0}}}
       >
-        {/* Mobile Drawer */}
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -91,13 +92,12 @@ const MainLayout = () => {
             },
           }}
         >
-          <Toolbar /> {/* Spacer for header */}
+          <Toolbar />
           <Box onClick={handleDrawerToggle} sx={{overflow: 'auto'}}>
             <MailboxList />
           </Box>
         </Drawer>
 
-        {/* Desktop Permanent Drawer */}
         <Drawer
           variant="permanent"
           sx={{
@@ -109,7 +109,7 @@ const MainLayout = () => {
           }}
           open
         >
-          <Toolbar /> {/* Spacer for header */}
+          <Toolbar />
           <Box sx={{overflow: 'auto'}}>
             <MailboxList />
           </Box>
@@ -129,9 +129,7 @@ const MainLayout = () => {
           overflow: 'hidden',
         }}
       >
-        <Toolbar /> {/* Spacer to push content below the fixed header */}
-
-        {/* Conditional Rendering preserves the TDD requirements */}
+        <Toolbar />
         <Box sx={{flexGrow: 1, overflow: 'auto', p: 2}}>
           {activeEmail ? <MailViewer /> : <MailList />}
         </Box>

@@ -1,4 +1,4 @@
-import {createContext, useState, useEffect, useMemo} from 'react';
+import {createContext, useState, useEffect, useMemo, useCallback} from 'react';
 import PropTypes from 'prop-types';
 
 export const MailContext = createContext();
@@ -37,6 +37,31 @@ export const MailProvider = ({children}) => {
         .then(setEmails)
         .catch(() => {});
   }, [mailbox]);
+
+  const fetchMyEmails = useCallback(() => {
+    fetch(`http://localhost:3010/api/v0/mail?mailbox=${mailbox}`)
+        .then((res) => {
+          if (!res.ok) throw new Error();
+          return res.json();
+        })
+        .then(setEmails)
+        .catch((err) => console.error(err));
+  }, [mailbox]);
+
+  useEffect(() => {
+    fetchMyEmails();
+  }, [fetchMyEmails]);
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:3010');
+    ws.onmessage = (event) => {
+      if (event.data === 'update') {
+        fetchMyEmails();
+      }
+    };
+
+    return () => ws.close();
+  }, [fetchMyEmails]);
 
   const selectEmail = async (email) => {
     try {
