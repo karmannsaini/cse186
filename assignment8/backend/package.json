@@ -1,0 +1,44 @@
+{
+  "name": "cse186-assignment8-backend",
+  "type": "module",
+  "version": "4.1.0",
+  "description": "CSE186 Assignment 8 - Backend",
+  "author": "David Harrison <dcharris@ucsc.edu>",
+  "license": "UNLICENSED",
+  "repository": "none",
+  "devDependencies": {
+    "@eslint/js": "*",
+    "@vitest/coverage-v8": "*",
+    "eslint": "*",
+    "eslint-config-google": "*",
+    "eslint-plugin-jsdoc": "*",
+    "globals": "8",
+    "jscpd": "*",
+    "node-fetch": "*",
+    "nodemon": "*",
+    "strip-comments": "*",
+    "supertest": "*",
+    "vite-plugin-eslint": "*",
+    "vitest": "*"
+  },
+  "dependencies": {
+    "bcrypt": "*",
+    "body-parser": "*",
+    "cors": "*",
+    "dotenv": "*",
+    "express": "*",
+    "express-openapi-validator": "*",
+    "js-yaml": "*",
+    "jsonwebtoken": "*",
+    "pg": "*",
+    "swagger-ui-express": "*",
+    "ws": "*"
+  },
+  "scripts": {
+    "cpd": "jscpd src test --silent",
+    "lint": "eslint src test --no-inline-config --report-unused-disable-directives --max-warnings 0",
+    "start": "nodemon src/server.js",
+    "test": "vitest run --no-file-parallelism --testTimeout=2000 --coverage",
+    "qtest": "(npm run lint -- --fix) && (npm run cpd) && (npm test)"
+  }
+}
