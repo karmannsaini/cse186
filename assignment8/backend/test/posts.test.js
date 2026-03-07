@@ -1,36 +1,15 @@
 import request from 'supertest';
-import {beforeAll, afterAll, describe, test, expect} from 'vitest';
+import {describe, test, expect} from 'vitest';
 import server from '../src/app.js';
-import {reset, close} from './db.js';
+import {registerLifecycle, loginAndGetToken} from './helpers.js';
 
-beforeAll(async () => {
-  await reset();
-});
-
-afterAll(() => {
-  close();
-});
-
-/**
- * Log in and extract a JWT for use in tests.
- * @param {string} email user email
- * @param {string} password user password
- * @returns {Promise<string>} JWT token
- */
-async function loginAndGetToken(email, password) {
-  const response = await request(server)
-      .post('/api/v0/auth/login')
-      .send({email, password})
-      .expect(200);
-
-  return response.body.token;
-}
+registerLifecycle();
 
 describe('GET /api/v0/posts', () => {
   test('returns posts for authenticated user sorted by date descending',
       async () => {
         const token =
-        await loginAndGetToken('molly@books.com', 'mollymember');
+        await loginAndGetToken(server, 'molly@books.com', 'mollymember');
 
         const response = await request(server)
             .get('/api/v0/posts')

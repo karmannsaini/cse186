@@ -1,35 +1,14 @@
 import request from 'supertest';
-import {beforeAll, afterAll, describe, test, expect} from 'vitest';
+import {describe, test, expect} from 'vitest';
 import server from '../src/app.js';
-import {reset, close} from './db.js';
+import {registerLifecycle, loginAndGetToken} from './helpers.js';
 
-beforeAll(async () => {
-  await reset();
-});
-
-afterAll(() => {
-  close();
-});
-
-/**
- * Log in and return a JWT token string.
- * @param {string} email user email
- * @param {string} password user password
- * @returns {Promise<string>} token
- */
-async function loginAndGetToken(email, password) {
-  const response = await request(server)
-      .post('/api/v0/auth/login')
-      .send({email, password})
-      .expect(200);
-
-  return response.body.token;
-}
+registerLifecycle();
 
 describe('Groups API', () => {
   test('lists groups for a member', async () => {
     const token =
-      await loginAndGetToken('molly@books.com', 'mollymember');
+      await loginAndGetToken(server, 'molly@books.com', 'mollymember');
 
     const response = await request(server)
         .get('/api/v0/groups')
@@ -53,12 +32,15 @@ describe('Groups API', () => {
     expect(response.body).toHaveProperty('message');
   });
 
+  const BOOKS_CLUB_ID = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
+  const ADMINS_ONLY_ID = 'd4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a';
+
   test('returns posts for a group the user is a member of', async () => {
     const token =
-      await loginAndGetToken('molly@books.com', 'mollymember');
+      await loginAndGetToken(server, 'molly@books.com', 'mollymember');
 
     const response = await request(server)
-        .get('/api/v0/groups/1/posts')
+        .get(`/api/v0/groups/${BOOKS_CLUB_ID}/posts`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
@@ -67,15 +49,15 @@ describe('Groups API', () => {
 
     const groupIds = response.body.map((post) => post.content.groupId);
     const uniqueGroupIds = Array.from(new Set(groupIds));
-    expect(uniqueGroupIds).toEqual([1]);
+    expect(uniqueGroupIds).toEqual([BOOKS_CLUB_ID]);
   });
 
   test('rejects access to group user is not a member of', async () => {
     const token =
-      await loginAndGetToken('molly@books.com', 'mollymember');
+      await loginAndGetToken(server, 'molly@books.com', 'mollymember');
 
     const response = await request(server)
-        .get('/api/v0/groups/4/posts')
+        .get(`/api/v0/groups/${ADMINS_ONLY_ID}/posts`)
         .set('Authorization', `Bearer ${token}`)
         .expect(403);
 

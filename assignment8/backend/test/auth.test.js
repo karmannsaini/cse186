@@ -1,15 +1,9 @@
 import request from 'supertest';
-import {beforeAll, afterAll, describe, test, expect} from 'vitest';
+import {describe, test, expect} from 'vitest';
 import server from '../src/app.js';
-import {reset, close} from './db.js';
+import {registerLifecycle} from './helpers.js';
 
-beforeAll(async () => {
-  await reset();
-});
-
-afterAll(() => {
-  close();
-});
+registerLifecycle();
 
 describe('POST /api/v0/auth/login', () => {
   test('logs in valid user and returns JWT', async () => {
@@ -53,6 +47,20 @@ describe('POST /api/v0/auth/login', () => {
 
     expect(response.body).toHaveProperty('message');
   });
+
+  test('handles user with minimal profile (roles/displayName fallbacks)',
+      async () => {
+        const response = await request(server)
+            .post('/api/v0/auth/login')
+            .send({email: 'minimal@test.com', password: 'minimal'})
+            .expect(200);
+        expect(response.body).toHaveProperty('token');
+        expect(response.body.user).toMatchObject({
+          email: 'minimal@test.com',
+          displayName: 'minimal@test.com',
+          roles: [],
+        });
+      });
 
   test('rejects malformed payload with 400', async () => {
     const response = await request(server)

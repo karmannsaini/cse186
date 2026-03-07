@@ -16,8 +16,40 @@ import ListItemText from '@mui/material/ListItemText';
 import PropTypes from 'prop-types';
 import {useAuth} from '../auth/AuthContext.jsx';
 import PostList from '../posts/PostList.jsx';
+import NotFoundPage from '../NotFoundPage.jsx';
 
 const API_BASE = 'http://localhost:3010/api/v0';
+
+/**
+ * App bar with title and logout; optional menu icon and user display.
+ * @param {object} props component props
+ * @param {string} props.title bar title
+ * @param {() => void} props.onLogout logout handler
+ * @param {object} [props.menuButton] optional menu icon element
+ * @param {object} [props.userDisplay] optional user text element
+ * @returns {object} AppBar element
+ */
+function PageAppBar({title, onLogout, menuButton, userDisplay}) {
+  return (
+    <AppBar position="static">
+      <Toolbar>
+        {menuButton}
+        <Typography variant="h6" sx={{flexGrow: 1}}>{title}</Typography>
+        {userDisplay}
+        <Button color="inherit" onClick={onLogout}>
+          Logout
+        </Button>
+      </Toolbar>
+    </AppBar>
+  );
+}
+
+PageAppBar.propTypes = {
+  title: PropTypes.string.isRequired,
+  onLogout: PropTypes.func.isRequired,
+  menuButton: PropTypes.node,
+  userDisplay: PropTypes.node,
+};
 
 /**
  * Home page after login. Shows all posts or posts for a selected group.
@@ -33,6 +65,8 @@ function HomePage({title}) {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [groupsError, setGroupsError] = useState('');
+  const [groupsLoaded, setGroupsLoaded] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const handleLogout = () => {
@@ -46,16 +80,30 @@ function HomePage({title}) {
 
   useEffect(() => {
     let active = true;
+    setGroupsError('');
+    setGroupsLoaded(false);
     const load = async () => {
       try {
         const response = await fetch(`${API_BASE}/groups`, {
           headers: {Authorization: `Bearer ${token}`},
         });
-        if (!response.ok) return;
+        if (!response.ok) {
+          if (active) {
+            setGroupsError('Unable to load groups');
+            setGroupsLoaded(true);
+          }
+          return;
+        }
         const data = await response.json();
-        if (active) setGroups(data);
+        if (active) {
+          setGroups(Array.isArray(data) ? data : []);
+          setGroupsLoaded(true);
+        }
       } catch {
-        // ignore
+        if (active) {
+          setGroupsError('Unable to load groups');
+          setGroupsLoaded(true);
+        }
       }
     };
     if (token) load();
@@ -95,6 +143,8 @@ function HomePage({title}) {
   }, [token, groupId]);
 
   const selectedGroup = groups.find((g) => String(g.id) === groupId);
+  const invalidGroup =
+    groupId && groupsLoaded && !selectedGroup;
   const appBarTitle =
     selectedGroup ? selectedGroup.name : title;
   const feedHeading =
@@ -120,10 +170,21 @@ function HomePage({title}) {
     </List>
   );
 
+  if (invalidGroup) {
+    return (
+      <Box sx={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
+        <PageAppBar title={title} onLogout={handleLogout} />
+        <NotFoundPage />
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
-      <AppBar position="static">
-        <Toolbar>
+      <PageAppBar
+        title={appBarTitle}
+        onLogout={handleLogout}
+        menuButton={
           <IconButton
             color="inherit"
             aria-label="open menu"
@@ -132,19 +193,13 @@ function HomePage({title}) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{flexGrow: 1}}>
-            {appBarTitle}
-          </Typography>
-          {user && (
-            <Typography variant="body1">
-              {user.displayName}
-            </Typography>
-          )}
-          <Button color="inherit" onClick={handleLogout}>
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
+        }
+        userDisplay={
+          user ? (
+            <Typography variant="body1">{user.displayName}</Typography>
+          ) : null
+        }
+      />
       <Box sx={{display: 'flex', flex: 1}}>
         <Drawer
           variant="temporary"
@@ -176,6 +231,11 @@ function HomePage({title}) {
           {drawerList}
         </Drawer>
         <Container component="main" sx={{mt: 2, flex: 1}}>
+          {groupsError && (
+            <Typography variant="body2" color="error" sx={{mb: 1}}>
+              {groupsError}
+            </Typography>
+          )}
           <Typography variant="h5" gutterBottom>
             {feedHeading}
           </Typography>
@@ -200,7 +260,7 @@ function HomePage({title}) {
             </Typography>
           )}
           {!loading && !error && posts.length > 0 && (
-            <PostList posts={posts} />
+            <PostList posts={posts} groups={groups} />
           )}
         </Container>
       </Box>

@@ -1,60 +1,29 @@
-import {describe, it, expect, beforeEach, afterEach, vi} from 'vitest';
-import {render, screen} from '@testing-library/react';
+import {describe, it, expect} from 'vitest';
+import {screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import App from '../App.jsx';
-
-const originalFetch = window.fetch;
+import {
+  registerFetchMock,
+  mockLoginResponse,
+  loginAsMolly,
+  renderApp,
+  getLoginInputs,
+} from './testHelpers.jsx';
 
 describe('Authentication flow', () => {
-  beforeEach(() => {
-    window.fetch = vi.fn();
-    sessionStorage.clear();
-  });
-
-  afterEach(() => {
-    window.fetch = originalFetch;
-    sessionStorage.clear();
-  });
-
-  const renderWithProviders = () => {
-    return render(<App />);
-  };
+  registerFetchMock();
 
   it('renders login form with email and password fields', () => {
-    renderWithProviders();
-
-    const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const button = screen.getByRole('button', {name: /sign in/i});
-
+    renderApp();
+    const {emailInput, passwordInput, button} = getLoginInputs();
     expect(emailInput).toBeInTheDocument();
     expect(passwordInput).toBeInTheDocument();
     expect(button).toBeInTheDocument();
   });
 
   it('logs in and navigates to home on valid credentials', async () => {
-    window.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        token: 'fake-token',
-        user: {
-          id: 1,
-          email: 'molly@books.com',
-          displayName: 'Molly Member',
-          roles: ['member'],
-        },
-      }),
-    });
+    window.fetch.mockResolvedValueOnce(mockLoginResponse());
 
-    renderWithProviders();
-
-    const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const button = screen.getByRole('button', {name: /sign in/i});
-
-    await userEvent.type(emailInput, 'molly@books.com');
-    await userEvent.type(passwordInput, 'mollymember');
-    await userEvent.click(button);
+    await loginAsMolly(renderApp);
 
     const homeHeading = await screen.findByText(/welcome to your feed/i);
     expect(homeHeading).toBeInTheDocument();
@@ -68,16 +37,9 @@ describe('Authentication flow', () => {
   });
 
   it('shows an error message when login fails', async () => {
-    window.fetch.mockResolvedValueOnce({
-      ok: false,
-    });
-
-    renderWithProviders();
-
-    const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const button = screen.getByRole('button', {name: /sign in/i});
-
+    window.fetch.mockResolvedValueOnce({ok: false});
+    renderApp();
+    const {emailInput, passwordInput, button} = getLoginInputs();
     await userEvent.type(emailInput, 'wrong@books.com');
     await userEvent.type(passwordInput, 'wrongpassword');
     await userEvent.click(button);
@@ -87,4 +49,3 @@ describe('Authentication flow', () => {
     expect(errorMessage).toBeInTheDocument();
   });
 });
-

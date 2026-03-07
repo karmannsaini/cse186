@@ -1,5 +1,6 @@
 import express from 'express';
 import {query, queryOne} from '../db.js';
+import {mapPostRows} from '../utils.js';
 
 const router = new express.Router();
 
@@ -30,12 +31,12 @@ router.get('/', async (req, res, next) => {
 router.get('/:groupId/posts', async (req, res, next) => {
   try {
     const userId = req.user.userId;
-    const groupId = Number(req.params.groupId);
+    const groupId = req.params.groupId;
 
     const membership = await queryOne(
         'SELECT 1 FROM groups g ' +
         'JOIN group_members gm ON gm.group_id = g.id ' +
-        'WHERE gm.user_id = $1 AND g.id = $2',
+        'WHERE gm.user_id = $1 AND g.id = $2::uuid',
         [userId, groupId],
     );
 
@@ -45,19 +46,13 @@ router.get('/:groupId/posts', async (req, res, next) => {
     }
 
     const result = await query(
-        'SELECT id, author_id, content FROM posts ' +
-        'WHERE (content->>\'groupId\')::integer = $1 ' +
-        'ORDER BY (content->>\'createdAt\')::timestamptz DESC',
+        'SELECT p.id, p.author_id, p.content, u.profile ' +
+        'FROM posts p JOIN users u ON u.id = p.author_id ' +
+        'WHERE p.content->>\'groupId\' = $1 ' +
+        'ORDER BY (p.content->>\'createdAt\')::timestamptz DESC',
         [groupId],
     );
-
-    const posts = result.rows.map((row) => ({
-      id: row.id,
-      authorId: row.author_id,
-      content: row.content,
-    }));
-
-    res.json(posts);
+    res.json(mapPostRows(result.rows));
   } catch (err) {
     next(err);
   }

@@ -12,7 +12,8 @@ const JWT_SECRET = process.env.JWT_SECRET || process.env.SECRET || 'dev-secret';
 export async function login(email, password) {
   const row = await queryOne(
       'SELECT id, profile FROM users WHERE profile->>\'email\' = $1 ' +
-      'AND password_hash = crypt($2, password_hash)',
+      'AND credentials->>\'password_hash\' = ' +
+      'crypt($2, credentials->>\'password_hash\')',
       [email, password],
   );
 

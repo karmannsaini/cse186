@@ -1,9 +1,8 @@
-import {describe, it, expect, beforeEach, afterEach, vi} from 'vitest';
+import {describe, it, expect} from 'vitest';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {AuthProvider, useAuth} from '../auth/AuthContext.jsx';
-
-const originalFetch = window.fetch;
+import {registerFetchMock, mockLoginResponse} from './testHelpers.jsx';
 
 /**
  * Component that calls useAuth without a provider.
@@ -37,27 +36,19 @@ function TestConsumer() {
 }
 
 describe('AuthContext', () => {
-  beforeEach(() => {
-    window.fetch = vi.fn();
-    sessionStorage.clear();
-  });
-
-  afterEach(() => {
-    window.fetch = originalFetch;
-    sessionStorage.clear();
-  });
+  registerFetchMock();
 
   it('throws when useAuth is used outside of provider', () => {
     expect(() => render(<ThrowingConsumer />))
         .toThrow('useAuth must be used within an AuthProvider');
   });
 
-  it('rehydrates user and token from sessionStorage on mount', async () => {
+  it('rehydrates user and token from localStorage on mount', async () => {
     const stored = {
       user: {id: 2, email: 'anna@books.com', displayName: 'Anna Admin'},
       token: 'stored-token',
     };
-    sessionStorage.setItem('auth', JSON.stringify(stored));
+    localStorage.setItem('auth', JSON.stringify(stored));
 
     render(
         <AuthProvider>
@@ -68,8 +59,8 @@ describe('AuthContext', () => {
     await screen.findByText('anna@books.com');
   });
 
-  it('clears sessionStorage when stored auth is invalid', () => {
-    sessionStorage.setItem('auth', 'not valid json');
+  it('clears localStorage when stored auth is invalid', () => {
+    localStorage.setItem('auth', 'not valid json');
 
     render(
         <AuthProvider>
@@ -77,23 +68,12 @@ describe('AuthContext', () => {
         </AuthProvider>,
     );
 
-    expect(sessionStorage.getItem('auth')).toBeNull();
+    expect(localStorage.getItem('auth')).toBeNull();
     expect(screen.getByText('none')).toBeInTheDocument();
   });
 
   it('clears user on logout', async () => {
-    window.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        token: 'fake-token',
-        user: {
-          id: 1,
-          email: 'molly@books.com',
-          displayName: 'Molly Member',
-          roles: ['member'],
-        },
-      }),
-    });
+    window.fetch.mockResolvedValueOnce(mockLoginResponse());
 
     render(
         <AuthProvider>
@@ -112,4 +92,3 @@ describe('AuthContext', () => {
     await screen.findByText('none');
   });
 });
-

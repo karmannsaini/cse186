@@ -15,37 +15,43 @@ import CssBaseline from '@mui/material/CssBaseline';
 import {AuthProvider, useAuth} from './auth/AuthContext.jsx';
 import LoginPage from './auth/LoginPage.jsx';
 import HomePage from './home/HomePage.jsx';
+import NotFoundPage from './NotFoundPage.jsx';
 
 /**
- * Application routes.
+ * Application routes. Must be rendered inside a Router
+ * (e.g. BrowserRouter or MemoryRouter).
  * @returns {object} routes element
  */
-function AppRoutes() {
+export function AppRoutes() {
   const {user} = useAuth();
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/login"
-          element={user ? <Navigate to="/home" replace /> : <LoginPage />}
-        />
-        <Route
-          path="/home"
-          element={user ? <HomePage /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/home/group/:groupId"
-          element={user ? <HomePage /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="*"
-          element={
-            <Navigate to={user ? '/home' : '/login'} replace />
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route
+        path="/"
+        element={<Navigate to={user ? '/home' : '/login'} replace />}
+      />
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/home" replace /> : <LoginPage />}
+      />
+      <Route
+        path="/home"
+        element={
+          user ? <HomePage title="Home" /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/home/group/:groupId"
+        element={
+          user ? <HomePage title="Home" /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="*"
+        element={<NotFoundPage />}
+      />
+    </Routes>
   );
 }
 
@@ -59,7 +65,9 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <AppRoutes />
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
   );

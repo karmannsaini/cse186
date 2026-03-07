@@ -9,7 +9,8 @@ import PropTypes from 'prop-types';
 
 const AUTH_STORAGE_KEY = 'auth';
 
-const AuthContext = createContext(null);
+/** React context for auth. Exported for tests that need to inject auth. */
+export const AuthContext = createContext(null);
 
 /**
  * Use the authentication context.
@@ -24,13 +25,13 @@ export function useAuth() {
 }
 
 /**
- * Read stored auth from sessionStorage for rehydration on refresh.
+ * Read stored auth from localStorage for rehydration on refresh/new tab.
  * @returns {{user: object|null, token: string|null}}
  *   Stored user and token, or nulls if missing/invalid.
  */
 function readStoredAuth() {
   try {
-    const raw = sessionStorage.getItem(AUTH_STORAGE_KEY);
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
     if (raw) {
       const {user: u, token: t} = JSON.parse(raw);
       if (u && t) {
@@ -38,14 +39,14 @@ function readStoredAuth() {
       }
     }
   } catch {
-    sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(AUTH_STORAGE_KEY);
   }
   return {user: null, token: null};
 }
 
 /**
  * Provide authentication state to descendants.
- * Persists token and user in sessionStorage so refresh keeps login.
+ * Persists token and user in localStorage so refresh and new tabs keep login.
  * @param {object} props component props
  * @param {React.ReactNode} props.children children
  * @returns {object} Provider element
@@ -55,12 +56,12 @@ export function AuthProvider({children}) {
 
   useEffect(() => {
     if (user && token) {
-      sessionStorage.setItem(
+      localStorage.setItem(
           AUTH_STORAGE_KEY,
           JSON.stringify({user, token}),
       );
     } else {
-      sessionStorage.removeItem(AUTH_STORAGE_KEY);
+      localStorage.removeItem(AUTH_STORAGE_KEY);
     }
   }, [user, token]);
 
