@@ -1,10 +1,10 @@
 import express from 'express';
 import {query, queryOne} from '../db.js';
-import {mapPostRows} from '../utils.js';
+import {mapPostRows, enrichPostsWithReactions} from '../utils.js';
 
-const router = new express.Router();
+const groupRouter = new express.Router();
 
-router.get('/', async (req, res, next) => {
+groupRouter.get('/', async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const result = await query(
@@ -28,7 +28,7 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.get('/:groupId/posts', async (req, res, next) => {
+groupRouter.get('/:groupId/posts', async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const groupId = req.params.groupId;
@@ -45,18 +45,19 @@ router.get('/:groupId/posts', async (req, res, next) => {
       return;
     }
 
-    const result = await query(
+    const baseResult = await query(
         'SELECT p.id, p.author_id, p.content, u.profile ' +
         'FROM posts p JOIN users u ON u.id = p.author_id ' +
         'WHERE p.content->>\'groupId\' = $1 ' +
         'ORDER BY (p.content->>\'createdAt\')::timestamptz DESC',
         [groupId],
     );
-    res.json(mapPostRows(result.rows));
+    const posts = mapPostRows(baseResult.rows);
+    return res.json(await enrichPostsWithReactions(query, userId, posts));
   } catch (err) {
     next(err);
   }
 });
 
-export default router;
+export default groupRouter;
 

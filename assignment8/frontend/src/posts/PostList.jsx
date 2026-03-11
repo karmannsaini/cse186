@@ -26,4 +26,3 @@ PostList.propTypes = {
 };
 
 export default PostList;
-

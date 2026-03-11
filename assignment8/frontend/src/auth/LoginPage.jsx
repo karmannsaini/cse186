@@ -10,7 +10,7 @@ import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
 import {useNavigate} from 'react-router-dom';
 import {useAuth} from './AuthContext.jsx';
-
+// https://mui.com/toolpad/core/react-sign-in-page/
 /**
  * Login page using a mobile-first Material UI layout.
  * @returns {object} login form

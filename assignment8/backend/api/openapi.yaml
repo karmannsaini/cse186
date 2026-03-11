@@ -65,6 +65,74 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /posts/{postId}/reactions:
+    put:
+      summary: Set or change the current user's reaction on a post
+      operationId: setPostReaction
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  $ref: '#/components/schemas/ReactionType'
+      responses:
+        '204':
+          description: Reaction set
+        '400':
+          description: Invalid reaction type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Remove the current user's reaction from a post
+      operationId: deletePostReaction
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Reaction removed
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /groups:
     get:
       summary: List groups the authenticated user is a member of
@@ -130,6 +198,15 @@ components:
       bearerFormat: JWT
 
   schemas:
+    ReactionType:
+      type: string
+      enum:
+        - like
+        - love
+        - haha
+        - wow
+        - sad
+        - angry
     LoginRequest:
       type: object
       required:
@@ -224,6 +301,14 @@ components:
             groupId:
               type: string
               format: uuid
+        reactions:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+          description: Aggregated reaction counts keyed by reaction type
+        userReaction:
+          $ref: '#/components/schemas/ReactionType'
 
     Group:
       type: object

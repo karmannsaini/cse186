@@ -1,5 +1,7 @@
 /* @vitest-environment node */
-import {describe, it, expect} from 'vitest';
+import {describe, it, expect, vi} from 'vitest';
+
+vi.mock('../App.jsx', () => ({default: () => null}));
 
 describe('testHelpers in node env', () => {
   it('loads when window is undefined', async () => {

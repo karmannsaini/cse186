@@ -35,7 +35,6 @@
     "ws": "*"
   },
   "scripts": {
-    "db:seed": "node scripts/seed-dev.js",
     "cpd": "jscpd src test --silent",
     "lint": "eslint src test --no-inline-config --report-unused-disable-directives --max-warnings 0",
     "start": "nodemon src/server.js",

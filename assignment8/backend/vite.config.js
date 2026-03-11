@@ -8,7 +8,7 @@ export default defineConfig({
   ],
   test: {
     environment: 'node',
-    setupFiles: ['test/setup.js'],
+    env: {NODE_ENV: 'test'},
     coverage: {
       include: [
         'src/**',

@@ -36,10 +36,20 @@ app.use('/api/v0/docs', swaggerUi.serve, swaggerUi.setup(apidoc));
 
 // Allow connections from a non common origin so dev and preview
 // UIs can connect
-app.use(cors(
-    {origin: 'http://localhost:3000'},
-    {origin: 'http://localhost:4173'},
-));
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:4173'],
+}));
+
+if (process.env.NODE_ENV === 'test') {
+  app.get('/api/v0/__coverage_err_status', (_req, _res, next) => {
+    const e = new Error('teapot');
+    e.status = 418;
+    next(e);
+  });
+  app.get('/api/v0/__coverage_err_no_status', (_req, _res, next) => {
+    next(new Error('no status'));
+  });
+}
 
 app.use(
     OpenApiValidator.middleware({
@@ -57,12 +67,14 @@ app.use('/api/v0/posts', authMiddleware, postsRouter);
 app.use('/api/v0/groups', authMiddleware, groupsRouter);
 
 app.use((err, req, res, next) => {
-  res.status(err.status).json({
+  const status = Number.isInteger(err?.status) ? err.status : 500;
+  res.status(status).json({
     message: err.message,
     errors: err.errors,
-    status: err.status,
+    status,
   });
 });
 
 const server = http.createServer(app);
+export {app};
 export default server;

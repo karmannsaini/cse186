@@ -1,8 +1,59 @@
-import {describe, it, expect} from 'vitest';
+import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import PostCard from '../posts/PostCard.jsx';
+import {AuthContext} from '../auth/AuthContext.jsx';
+
+const renderWithAuth = (ui, {token = 'test-token'} = {}) => {
+  return render(
+      <AuthContext.Provider value={{
+        user: {id: 1, displayName: 'Test User'},
+        token,
+        login: async () => {},
+        logout: () => {},
+      }}>
+        {ui}
+      </AuthContext.Provider>,
+  );
+};
 
 describe('PostCard', () => {
+  const basePost = {
+    id: 10,
+    authorId: 1,
+    authorDisplayName: 'Alice',
+    content: {
+      text: 'Hello',
+      createdAt: '2025-01-01T10:00:00.000Z',
+    },
+    reactions: {},
+  };
+
+  const setupPostWithReactions = async (overrides = {}) => {
+    const user = userEvent.setup();
+    renderWithAuth(<PostCard post={{
+      ...basePost,
+      ...overrides,
+    }} />);
+    return user;
+  };
+
+  const getLikeCountElement = () => {
+    const likeBtn = screen.getByRole('button', {name: 'Like'});
+    const likeRow = likeBtn.parentElement;
+    const spans = Array.from(likeRow.querySelectorAll('span'));
+    return spans.find((s) => /^\d+$/.test(s.textContent.trim()));
+  };
+
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ok: true}));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
   it('renders post with normal content', () => {
     const post = {
       id: 1,
@@ -13,7 +64,7 @@ describe('PostCard', () => {
         visibility: 'PUBLIC',
       },
     };
-    render(<PostCard post={post} />);
+    renderWithAuth(<PostCard post={post} />);
     expect(screen.getByText('Hello world')).toBeInTheDocument();
     expect(screen.getByText(/posted/i)).toBeInTheDocument();
   });
@@ -24,7 +75,7 @@ describe('PostCard', () => {
       authorId: 1,
       content: 'Plain string content',
     };
-    render(<PostCard post={post} />);
+    renderWithAuth(<PostCard post={post} />);
     expect(screen.getByText('Plain string content')).toBeInTheDocument();
   });
 
@@ -34,7 +85,7 @@ describe('PostCard', () => {
       authorId: 1,
       content: {},
     };
-    render(<PostCard post={post} />);
+    renderWithAuth(<PostCard post={post} />);
     expect(screen.getByText('(No content)')).toBeInTheDocument();
   });
 
@@ -48,7 +99,7 @@ describe('PostCard', () => {
         createdAt: '2025-01-01T10:00:00.000Z',
       },
     };
-    render(<PostCard post={post} />);
+    renderWithAuth(<PostCard post={post} />);
     const truncated = screen.getByText(/a+\.\.\./);
     expect(truncated.textContent).toHaveLength(500);
     expect(truncated.textContent.endsWith('...')).toBe(true);
@@ -62,7 +113,7 @@ describe('PostCard', () => {
         text: 'No date post',
       },
     };
-    render(<PostCard post={post} />);
+    renderWithAuth(<PostCard post={post} />);
     expect(screen.getByText('No date post')).toBeInTheDocument();
     expect(screen.queryByText(/posted/i)).not.toBeInTheDocument();
   });
@@ -82,10 +133,92 @@ describe('PostCard', () => {
       {id: 1, name: 'Books Club'},
       {id: 2, name: 'Cooking Circle'},
     ];
-    render(<PostCard post={post} groups={groups} />);
+    renderWithAuth(<PostCard post={post} groups={groups} />);
     expect(
         screen.getByText(/group post by jane doe into books club/i),
     ).toBeInTheDocument();
     expect(screen.getByText('Group-only post')).toBeInTheDocument();
+  });
+
+  it('does not call API when token is missing', async () => {
+    const user = userEvent.setup();
+    renderWithAuth(<PostCard post={basePost} />, {token: ''});
+    await user.click(screen.getByRole('button', {name: 'Like'}));
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+  });
+
+  it('sends PUT and increments count when reacting', async () => {
+    const user = await setupPostWithReactions({
+      reactions: {like: 0},
+    });
+
+    await user.click(screen.getByRole('button', {name: 'Like'}));
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+        'http://localhost:3010/api/v0/posts/10/reactions',
+        expect.objectContaining({
+          method: 'PUT',
+          headers: expect.objectContaining({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer test-token',
+          }),
+          body: JSON.stringify({type: 'like'}),
+        }),
+    );
+
+    expect(screen.getByText('1')).toBeInTheDocument();
+  });
+
+  it('switching reaction decrements previous and increments new', async () => {
+    const user = await setupPostWithReactions({
+      userReaction: 'like',
+      reactions: {like: 1, love: 0},
+    });
+
+    await user.click(screen.getByRole('button', {name: 'Love'}));
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+        'http://localhost:3010/api/v0/posts/10/reactions',
+        expect.objectContaining({
+          method: 'PUT',
+          body: JSON.stringify({type: 'love'}),
+        }),
+    );
+
+    // like should go down to 0, love up to 1
+    expect(screen.getAllByText('0').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('1').length).toBeGreaterThan(0);
+  });
+
+  it('toggles reaction off with DELETE', async () => {
+    const user = await setupPostWithReactions({
+      userReaction: 'like',
+      reactions: {like: 1},
+    });
+
+    await user.click(screen.getByRole('button', {name: 'Like'}));
+
+    const lastCall = globalThis.fetch.mock.calls.at(-1);
+    expect(lastCall[0]).toBe(
+        'http://localhost:3010/api/v0/posts/10/reactions');
+    expect(lastCall[1].method).toBe('DELETE');
+    expect(lastCall[1].headers['Authorization'])
+        .toBe('Bearer test-token');
+
+    const likeCount = getLikeCountElement();
+    expect(likeCount).toHaveTextContent('0');
+  });
+
+  it('does not update state when API call fails', async () => {
+    globalThis.fetch.mockRejectedValueOnce(new Error('network'));
+    const user = await setupPostWithReactions({
+      reactions: {like: 0},
+    });
+
+    await user.click(screen.getByRole('button', {name: 'Like'}));
+
+    // still 0 because we ignore failures
+    const likeCount = getLikeCountElement();
+    expect(likeCount).toHaveTextContent('0');
   });
 });
