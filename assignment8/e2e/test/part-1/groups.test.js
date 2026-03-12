@@ -24,11 +24,6 @@ describe('Groups and Deep Linking', () => {
     ]);
   });
 
-  afterEach(async () => {
-    await page.close();
-    await context.close();
-  });
-
   it('displays a list of groups the user belongs to', async () => {
     await page.waitForSelector('::-p-text(Welcome to your feed)');
     await page.waitForSelector('.MuiListItemButton-root', {timeout: 5000});

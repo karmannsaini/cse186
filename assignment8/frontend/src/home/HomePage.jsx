@@ -260,7 +260,20 @@ function HomePage({title}) {
             </Typography>
           )}
           {!loading && !error && posts.length > 0 && (
-            <PostList posts={posts} groups={groups} />
+            <PostList
+              posts={posts}
+              groups={groups}
+              onPostUpdated={(postId, text) => {
+                setPosts((prev) => prev.map((p) => (
+                  Number(p.id) === postId ?
+                    {...p, content: {...p.content, text}} :
+                    p
+                )));
+              }}
+              onPostDeleted={(postId) => {
+                setPosts((prev) => prev.filter((p) => p.id !== postId));
+              }}
+            />
           )}
         </Container>
       </Box>

@@ -4,6 +4,29 @@ import {mapPostRows, enrichPostsWithReactions} from '../utils.js';
 
 const router = new express.Router();
 
+/**
+ * Load post and ensure the authenticated user is its author.
+ * @param {object} res Express res
+ * @param {number} userId authenticated user id
+ * @param {number} postId post id
+ * @returns {Promise<object|null>} post row or null if already responded
+ */
+async function loadOwnedPostOrSendError(res, userId, postId) {
+  const post = await queryOne(
+      'SELECT id, author_id FROM posts WHERE id = $1',
+      [postId],
+  );
+  if (!post) {
+    res.status(404).json({message: 'Post not found'});
+    return null;
+  }
+  if (post.author_id !== userId) {
+    res.status(403).json({message: 'Forbidden'});
+    return null;
+  }
+  return post;
+}
+
 router.get('/', async (req, res, next) => {
   try {
     const userId = req.user.userId;
@@ -73,6 +96,51 @@ router.delete('/:postId/reactions', async (req, res, next) => {
         [postId, userId],
     );
 
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.patch('/:postId', async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const postId = Number(req.params.postId);
+    const {text} = req.body || {};
+    if (typeof text !== 'string') {
+      res.status(400).json({message: 'Invalid post text'});
+      return;
+    }
+
+    const post = await loadOwnedPostOrSendError(res, userId, postId);
+    if (!post) {
+      return;
+    }
+
+    await query(
+        'UPDATE posts ' +
+        'SET content = jsonb_set(content, \'{text}\', ' +
+        '  to_jsonb($1::text), true) ' +
+        'WHERE id = $2',
+        [text, postId],
+    );
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/:postId', async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const postId = Number(req.params.postId);
+
+    const post = await loadOwnedPostOrSendError(res, userId, postId);
+    if (!post) {
+      return;
+    }
+
+    await query('DELETE FROM posts WHERE id = $1', [postId]);
     res.status(204).end();
   } catch (err) {
     next(err);

@@ -20,6 +20,20 @@ describe('Authentication flow', () => {
     expect(button).toBeInTheDocument();
   });
 
+  it('toggles password visibility', async () => {
+    renderApp();
+    const {passwordInput} = getLoginInputs();
+    expect(passwordInput).toHaveAttribute('type', 'password');
+
+    const showBtn = screen.getByRole('button', {name: /show password/i});
+    await userEvent.click(showBtn);
+    expect(passwordInput).toHaveAttribute('type', 'text');
+
+    const hideBtn = screen.getByRole('button', {name: /hide password/i});
+    await userEvent.click(hideBtn);
+    expect(passwordInput).toHaveAttribute('type', 'password');
+  });
+
   it('logs in and navigates to home on valid credentials', async () => {
     window.fetch.mockResolvedValueOnce(mockLoginResponse());
 

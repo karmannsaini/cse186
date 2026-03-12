@@ -1,12 +1,16 @@
-// Your vitest common setup functionaltiy goes in here
 import {beforeAll, afterAll, beforeEach, afterEach} from 'vitest';
 import puppeteer from 'puppeteer';
-import path from 'path';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import express from 'express';
-import http from 'http';
+import http from 'node:http';
 
 import 'dotenv/config';
 import backend from '../../backend/src/app.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distRoot = path.join(__dirname, '..', '..', 'frontend', 'dist');
 
 export let frontend;
 export let browser;
@@ -16,33 +20,57 @@ const UI_PORT = 3000;
 const API_PORT = 3010;
 export const BASE_URL = `http://localhost:${UI_PORT}`;
 
-beforeAll(() => {
-  backend.listen(API_PORT, () => {
-    console.log(`Backend Running at http://localhost:${API_PORT}`);
+/**
+ * Start a server listening on the given port.
+ * @param {object} server http/server
+ * @param {number} port port number
+ * @returns {Promise<void>} resolves when listening
+ */
+function listen(server, port) {
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(port, () => resolve());
   });
+}
 
-  frontend = http.createServer(
-      express()
-          .use('/assets', express.static(
-              path.join(__dirname, '..', '..', 'frontend', 'dist', 'assets')))
-          .get('/', function(req, res) {
-            res.sendFile('index.html', {
-              root: path.join(__dirname, '..', '..', 'frontend', 'dist'),
-            });
-          }),
-  );
-
-  frontend.listen(UI_PORT, () => {
-    console.log(`Frontend Running at ${BASE_URL}`);
+/**
+ * Close an http server.
+ * @param {object|undefined} server node server
+ * @returns {Promise<void>} closes when server is stopped
+ */
+function close(server) {
+  return new Promise((resolve) => {
+    if (!server) {
+      resolve();
+      return;
+    }
+    server.close(() => resolve());
   });
+}
+
+/**
+ * Start backend and static frontend servers.
+ * @returns {Promise<void>} resolves when both servers are listening
+ */
+beforeAll(async () => {
+  const frontendApp = express();
+  frontendApp.use(express.static(distRoot));
+  frontendApp.use((_req, res) => {
+    res.sendFile(path.join(distRoot, 'index.html'));
+  });
+  frontend = http.createServer(frontendApp);
+
+  await Promise.all([
+    listen(backend, API_PORT),
+    listen(frontend, UI_PORT),
+  ]);
 });
 
 afterAll(async () => {
-  backend.close();
-  await frontend.close();
-  setImmediate(() => {
-    frontend.emit('close');
-  });
+  await Promise.all([
+    close(backend),
+    close(frontend),
+  ]);
 });
 
 beforeEach(async () => {
@@ -55,9 +83,8 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  const childProcess = browser && browser.process && browser.process();
-  if (childProcess) {
-    await childProcess.kill(9);
+  if (browser) {
+    await browser.close();
   }
 });
 

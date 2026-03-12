@@ -81,7 +81,7 @@ export function renderApp() {
 export function getLoginInputs() {
   return {
     emailInput: screen.getByLabelText(/email address/i),
-    passwordInput: screen.getByLabelText(/password/i),
+    passwordInput: screen.getByLabelText(/password/i, {selector: 'input'}),
     button: screen.getByRole('button', {name: /sign in/i}),
   };
 }

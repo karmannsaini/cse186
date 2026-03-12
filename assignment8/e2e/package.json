@@ -22,8 +22,8 @@
   "scripts": {
     "docker": "cd ../backend && docker compose down && docker compose up -d",
     "build": "cd ../frontend && npm run build",
-    "e2e": "vitest run --no-file-parallelism --testTimeout=20000",
-    "test": "(npm run build) && (npm run docker) && (npm run e2e)",
+    "e2e": "(npm run build) && vitest run --no-file-parallelism --testTimeout=20000",
+    "test": "(npm run docker) && (npm run e2e)",
     "lint": "eslint test --no-inline-config --max-warnings 0"
   }
 }

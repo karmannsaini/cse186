@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest';
-import {page, BASE_URL} from '../setup.js';
+import {page} from '../setup.js';
 
 const TEST_USER = {
   email: 'molly@books.com',

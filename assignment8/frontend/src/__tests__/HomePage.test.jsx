@@ -347,4 +347,51 @@ describe('HomePage', () => {
     await screen.findByText(/welcome to your feed/i);
     expect(screen.getByRole('button', {name: /logout/i})).toBeInTheDocument();
   });
+
+  it('updates feed state when a post is edited and deleted', async () => {
+    applyLoginGroupsPostsMocks(
+        DEFAULT_GROUPS,
+        [{
+          id: 7,
+          authorId: 1,
+          authorDisplayName: 'Molly',
+          content: {
+            text: 'Editable post',
+            createdAt: '2025-01-01T10:00:00.000Z',
+            visibility: 'PUBLIC',
+          },
+          reactions: {},
+        }, {
+          id: 8,
+          authorId: 2,
+          authorDisplayName: 'Other',
+          content: {
+            text: 'Other post',
+            createdAt: '2025-01-01T10:00:00.000Z',
+            visibility: 'PUBLIC',
+          },
+          reactions: {},
+        }],
+    );
+
+    await loginAsMolly();
+    await screen.findByText(/editable post/i);
+    await screen.findByText(/other post/i);
+
+    // Make sure any follow-up fetches used by edit/delete succeed.
+    window.fetch.mockResolvedValue({ok: true});
+
+    // Edit flow (covers HomePage onPostUpdated mapping).
+    await userEvent.click(screen.getByRole('button', {name: /edit post/i}));
+    const editor = screen.getByLabelText(/edit post/i, {selector: 'textarea'});
+    await userEvent.clear(editor);
+    await userEvent.type(editor, 'Edited text');
+    await userEvent.click(screen.getByRole('button', {name: /save/i}));
+    expect(await screen.findByText(/edited text/i)).toBeInTheDocument();
+    expect(screen.getByText(/other post/i)).toBeInTheDocument();
+
+    // Delete flow (covers HomePage onPostDeleted filter).
+    await userEvent.click(screen.getByRole('button', {name: /delete post/i}));
+    expect(screen.queryByText(/edited text/i)).not.toBeInTheDocument();
+  }, 10000);
 });

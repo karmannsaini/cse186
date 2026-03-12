@@ -38,6 +38,25 @@ describe('PostCard', () => {
     return user;
   };
 
+  const setupEditableCard = (props = {}) => {
+    const user = userEvent.setup({delay: 0});
+    renderWithAuth(<PostCard post={basePost} {...props} />);
+    return user;
+  };
+
+  const openEditor = async (user) => {
+    await user.click(screen.getByRole('button', {name: /edit post/i}));
+    return screen.getByLabelText(/edit post/i, {selector: 'textarea'});
+  };
+
+  const saveEdit = async (user) => {
+    await user.click(screen.getByRole('button', {name: /save/i}));
+  };
+
+  const cancelEdit = async (user) => {
+    await user.click(screen.getByRole('button', {name: /cancel/i}));
+  };
+
   const getLikeCountElement = () => {
     const likeBtn = screen.getByRole('button', {name: 'Like'});
     const likeRow = likeBtn.parentElement;
@@ -147,6 +166,26 @@ describe('PostCard', () => {
     expect(globalThis.fetch).not.toHaveBeenCalled();
   });
 
+  it('does not call edit/delete API when token is missing', async () => {
+    const onPostUpdated = vi.fn();
+    const onPostDeleted = vi.fn();
+    const user = userEvent.setup();
+    renderWithAuth(
+        <PostCard post={basePost} onPostUpdated={onPostUpdated}
+          onPostDeleted={onPostDeleted} />,
+        {token: ''},
+    );
+
+    await user.click(screen.getByRole('button', {name: /edit post/i}));
+    await user.click(screen.getByRole('button', {name: /save/i}));
+    await user.click(screen.getByRole('button', {name: /cancel/i}));
+    await user.click(screen.getByRole('button', {name: /delete post/i}));
+
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(onPostUpdated).not.toHaveBeenCalled();
+    expect(onPostDeleted).not.toHaveBeenCalled();
+  });
+
   it('sends PUT and increments count when reacting', async () => {
     const user = await setupPostWithReactions({
       reactions: {like: 0},
@@ -220,5 +259,108 @@ describe('PostCard', () => {
     // still 0 because we ignore failures
     const likeCount = getLikeCountElement();
     expect(likeCount).toHaveTextContent('0');
+  });
+
+  it('shows edit/delete controls only for the author', () => {
+    renderWithAuth(<PostCard post={{...basePost, authorId: 2}} />);
+    expect(screen.queryByRole('button', {name: /edit post/i}))
+        .not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /delete post/i}))
+        .not.toBeInTheDocument();
+  });
+
+  it('edits a post with PATCH and calls onPostUpdated', async () => {
+    const onPostUpdated = vi.fn();
+    const user = setupEditableCard({onPostUpdated});
+    const editor = await openEditor(user);
+    await user.clear(editor);
+    await user.type(editor, 'Updated text');
+    await saveEdit(user);
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+        'http://localhost:3010/api/v0/posts/10',
+        expect.objectContaining({
+          method: 'PATCH',
+          headers: expect.objectContaining({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer test-token',
+          }),
+          body: JSON.stringify({text: 'Updated text'}),
+        }),
+    );
+    expect(onPostUpdated).toHaveBeenCalledWith(10, 'Updated text');
+  });
+
+  it('does not call onPostUpdated when PATCH fails', async () => {
+    globalThis.fetch.mockResolvedValueOnce({ok: false});
+    const onPostUpdated = vi.fn();
+    const user = setupEditableCard({onPostUpdated});
+    const editor = await openEditor(user);
+    await user.type(editor, ' (ignored)');
+    await saveEdit(user);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+        'http://localhost:3010/api/v0/posts/10',
+        expect.objectContaining({method: 'PATCH'}),
+    );
+    expect(onPostUpdated).not.toHaveBeenCalled();
+  });
+
+  it('keeps edit mode when PATCH throws', async () => {
+    globalThis.fetch.mockRejectedValueOnce(new Error('network'));
+    const onPostUpdated = vi.fn();
+    const user = setupEditableCard({onPostUpdated});
+    await openEditor(user);
+    await saveEdit(user);
+    expect(onPostUpdated).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(/edit post/i, {selector: 'textarea'}))
+        .toBeInTheDocument();
+  });
+
+  it('cancels edit and restores original text', async () => {
+    const onPostUpdated = vi.fn();
+    const user = setupEditableCard({onPostUpdated});
+    const editor = await openEditor(user);
+    await user.type(editor, ' (draft)');
+    await cancelEdit(user);
+    expect(onPostUpdated).not.toHaveBeenCalled();
+    expect(
+        screen.queryByLabelText(/edit post/i, {selector: 'textarea'}),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Hello')).toBeInTheDocument();
+  });
+
+  it('deletes a post with DELETE and calls onPostDeleted', async () => {
+    const onPostDeleted = vi.fn();
+    const user = setupEditableCard({onPostDeleted});
+    await user.click(screen.getByRole('button', {name: /delete post/i}));
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+        'http://localhost:3010/api/v0/posts/10',
+        expect.objectContaining({
+          method: 'DELETE',
+          headers: expect.objectContaining({
+            'Authorization': 'Bearer test-token',
+          }),
+        }),
+    );
+    expect(onPostDeleted).toHaveBeenCalledWith(10);
+  });
+
+  it.each([
+    {
+      name: 'fails',
+      setupFetch: () => globalThis.fetch.mockResolvedValueOnce({ok: false}),
+    },
+    {
+      name: 'throws',
+      setupFetch: () => globalThis.fetch.mockRejectedValueOnce(
+          new Error('network'),
+      ),
+    },
+  ])('does not call onPostDeleted when DELETE $name', async ({setupFetch}) => {
+    setupFetch();
+    const onPostDeleted = vi.fn();
+    const user = setupEditableCard({onPostDeleted});
+    await user.click(screen.getByRole('button', {name: /delete post/i}));
+    expect(onPostDeleted).not.toHaveBeenCalled();
   });
 });
