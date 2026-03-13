@@ -27,6 +27,61 @@ async function loadOwnedPostOrSendError(res, userId, postId) {
   return post;
 }
 
+router.post('/', async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const {text, groupId} = req.body || {};
+    if (typeof text !== 'string' || text.trim() === '') {
+      res.status(400).json({message: 'Invalid post text'});
+      return;
+    }
+    const trimmed = text.trim();
+
+    let effectiveGroupId = null;
+    if (groupId != null && groupId !== '') {
+      const membership = await queryOne(
+          'SELECT 1 FROM group_members WHERE user_id = $1 ' +
+          'AND group_id = $2::uuid',
+          [userId, groupId],
+      );
+      if (!membership) {
+        res.status(403).json({message: 'Forbidden'});
+        return;
+      }
+      effectiveGroupId = groupId;
+    }
+
+    const createdAt = new Date().toISOString();
+    const content = {
+      text: trimmed,
+      createdAt,
+      visibility: 'PUBLIC',
+      ...(effectiveGroupId ? {groupId: effectiveGroupId} : {}),
+    };
+
+    const insertResult = await query(
+        'INSERT INTO posts (author_id, content) VALUES ($1, $2::jsonb) ' +
+        'RETURNING id',
+        [userId, JSON.stringify(content)],
+    );
+    const newId = insertResult.rows[0].id;
+
+    const baseResult = await query(
+        'SELECT p.id, p.author_id, p.content, u.profile ' +
+        'FROM posts p JOIN users u ON u.id = p.author_id ' +
+        'WHERE p.id = $1',
+        [newId],
+    );
+    const rows = baseResult.rows;
+    const posts = mapPostRows(rows);
+    const enriched = await enrichPostsWithReactions(query, userId, posts);
+
+    res.status(201).json(enriched[0]);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/', async (req, res, next) => {
   try {
     const userId = req.user.userId;

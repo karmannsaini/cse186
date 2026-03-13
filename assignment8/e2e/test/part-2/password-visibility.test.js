@@ -31,5 +31,29 @@ describe('Login password visibility', () => {
     const typeAfterHide = await passwordInput.evaluate((el) => el.type);
     expect(typeAfterHide).toBe('password');
   });
+
+  it('resets to hidden password field on fresh visit', async () => {
+    await page.waitForSelector('input[autocomplete="current-password"]');
+    const passwordInput =
+      await page.$('input[autocomplete="current-password"]');
+
+    const showBtn = await page.waitForSelector(
+        'button[aria-label="Show password"]',
+        {timeout: 5000},
+    );
+    await showBtn.click();
+
+    const typeAfterShow = await passwordInput.evaluate((el) => el.type);
+    expect(typeAfterShow).toBe('text');
+
+    // Simulate a fresh visit to the login page (e.g., after logout).
+    await page.goto(page.url(), {waitUntil: 'networkidle0'});
+    await page.waitForSelector('input[autocomplete="current-password"]');
+    const passwordInputAfterReload =
+      await page.$('input[autocomplete="current-password"]');
+    const typeAfterReload =
+      await passwordInputAfterReload.evaluate((el) => el.type);
+    expect(typeAfterReload).toBe('password');
+  });
 });
 

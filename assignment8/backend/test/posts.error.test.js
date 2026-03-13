@@ -116,5 +116,33 @@ describe('posts router error handling', () => {
         (client) => client.delete('/posts/1').expect(500),
     );
   });
+
+  test('POST post returns 400 for invalid text', async () => {
+    const app = appWithPosts();
+    const res = await request(app)
+        .post('/posts')
+        .send({text: 123})
+        .expect(400);
+    expect(res.body).toHaveProperty('message', 'Invalid post text');
+  });
+
+  test('POST post returns 400 when body is missing', async () => {
+    const app = appWithPostsNoJson();
+    const res = await request(app)
+        .post('/posts')
+        .expect(400);
+    expect(res.body).toHaveProperty('message', 'Invalid post text');
+  });
+
+  test('POST post propagates DB errors via next', async () => {
+    const app = appWithPosts();
+    await assertErrorPropagated(
+        app,
+        (client) => client
+            .post('/posts')
+            .send({text: 'new post'})
+            .expect(500),
+    );
+  });
 });
 

@@ -18,6 +18,7 @@ export default defineConfig({
         'src/main.jsx',
         'eslint.config.js',
         'vite.config.js',
+        'src/__tests__/**',
       ],
     },
   },

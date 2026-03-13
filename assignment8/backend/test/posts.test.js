@@ -94,6 +94,87 @@ describe('GET /api/v0/posts', () => {
   });
 });
 
+describe('POST /api/v0/posts', () => {
+  test('creates a new top-level post for the authenticated user', async () => {
+    const token = await mollyToken();
+    const before = await getPosts(server, token);
+
+    const res = await request(server)
+        .post('/api/v0/posts')
+        .set('Authorization', `Bearer ${token}`)
+        .send({text: 'New post from Molly'})
+        .expect(201);
+
+    expect(res.body).toMatchObject({
+      authorId: 1,
+      content: expect.objectContaining({
+        text: 'New post from Molly',
+      }),
+      reactions: expect.any(Object),
+    });
+
+    const after = await getPosts(server, token);
+    expect(after.length).toBe(before.length + 1);
+    const created = findPost(after, res.body.id);
+    expect(created.content.text).toBe('New post from Molly');
+  });
+
+  test('trims whitespace and rejects empty text with 400', async () => {
+    const token = await mollyToken();
+    const emptyRes = await request(server)
+        .post('/api/v0/posts')
+        .set('Authorization', `Bearer ${token}`)
+        .send({text: '   '})
+        .expect(400);
+    expect(emptyRes.body).toHaveProperty('message');
+  });
+
+  test('creates a post inside a group the user belongs to', async () => {
+    const token = await mollyToken();
+    const groupsRes = await request(server)
+        .get('/api/v0/groups')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+    const groups = groupsRes.body;
+    expect(groups.length).toBeGreaterThan(0);
+    const targetGroup = groups[0];
+
+    const res = await request(server)
+        .post('/api/v0/posts')
+        .set('Authorization', `Bearer ${token}`)
+        .send({text: 'Group post from Molly', groupId: targetGroup.id})
+        .expect(201);
+
+    expect(res.body.content.groupId).toBe(String(targetGroup.id));
+  });
+
+  test('returns 403 when posting to a group the user is not a member of',
+      async () => {
+        const token = await mollyToken();
+        // Anna is member of Admins Only; Molly is not.
+        const annaToken = await loginAndGetToken(
+            server,
+            'anna@books.com',
+            'annaadmin',
+        );
+        const annaGroupsRes = await request(server)
+            .get('/api/v0/groups')
+            .set('Authorization', `Bearer ${annaToken}`)
+            .expect(200);
+        const annaGroups = annaGroupsRes.body;
+        const adminsOnly = annaGroups.find((g) => /Admins Only/i
+            .test(g.name));
+        expect(adminsOnly).toBeDefined();
+
+        const res = await request(server)
+            .post('/api/v0/posts')
+            .set('Authorization', `Bearer ${token}`)
+            .send({text: 'Not allowed', groupId: adminsOnly.id})
+            .expect(403);
+        expect(res.body).toHaveProperty('message', 'Forbidden');
+      });
+});
+
 describe('PATCH /api/v0/posts/:postId', () => {
   test('allows author to edit their own post text', async () => {
     const {token, posts} = await mollyPosts();

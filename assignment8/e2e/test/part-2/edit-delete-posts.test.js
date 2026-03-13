@@ -58,31 +58,29 @@ describe('Edit and delete posts', () => {
     expect(editBtn).toBeTruthy();
     await editBtn.click();
 
-    await page.waitForSelector('textarea');
-    const textarea = await page.$('textarea');
+    await card.waitForSelector('textarea');
+    const textarea = await card.$('textarea');
     expect(textarea).toBeTruthy();
     await textarea.click({clickCount: 3});
     await textarea.type('Edited in E2E');
 
     const saveHandle = await card.evaluateHandle((el) => {
       const buttons = Array.from(el.querySelectorAll('button'));
-      return buttons.find((b) => (b.textContent || '').trim() === 'Save') ||
-        null;
+      return buttons.find((b) =>
+        (b.textContent || '').trim().toLowerCase() === 'save') || null;
     });
     const saveBtn = saveHandle.asElement();
     expect(saveBtn).toBeTruthy();
     await saveBtn.click();
 
-    // After save, the card should no longer show a textarea and body text
-    // should reflect the new content.
+    const cardHandle = await card.evaluateHandle((el) => el);
     await page.waitForFunction(
-        (handle) => {
-          const el = handle;
-          const textarea = el.querySelector('textarea[aria-label="Edit post"]');
-          return !textarea;
+        (el) => {
+          const body = el.querySelector('.MuiTypography-body1');
+          return (body?.textContent || '').includes('Edited in E2E');
         },
-        {},
-        await card.evaluateHandle((el) => el),
+        {timeout: 5000},
+        cardHandle,
     );
 
     const updatedBody = await card.evaluate((el) => {

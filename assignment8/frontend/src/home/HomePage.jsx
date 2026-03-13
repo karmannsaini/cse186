@@ -5,6 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -68,6 +69,11 @@ function HomePage({title}) {
   const [groupsError, setGroupsError] = useState('');
   const [groupsLoaded, setGroupsLoaded] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [newPostText, setNewPostText] = useState('');
+  const [newPostError, setNewPostError] = useState('');
+  const [members, setMembers] = useState([]);
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [membersError, setMembersError] = useState('');
 
   const handleLogout = () => {
     logout();
@@ -77,6 +83,12 @@ function HomePage({title}) {
     navigate(path);
     setMobileDrawerOpen(false);
   };
+
+  // When switching groups, collapse any open members list and clear errors.
+  useEffect(() => {
+    setMembers([]);
+    setMembersError('');
+  }, [groupId]);
 
   useEffect(() => {
     let active = true;
@@ -149,6 +161,9 @@ function HomePage({title}) {
     selectedGroup ? selectedGroup.name : title;
   const feedHeading =
     selectedGroup ? `${selectedGroup.name}` : 'Welcome to your feed';
+
+  const canCreate =
+    Boolean(token) && newPostText !== '' && !loading;
 
   const drawerList = (
     <List>
@@ -239,6 +254,126 @@ function HomePage({title}) {
           <Typography variant="h5" gutterBottom>
             {feedHeading}
           </Typography>
+          {selectedGroup && (
+            <Box sx={{mb: 1, display: 'flex', alignItems: 'center', gap: 1}}>
+              <Button
+                variant="outlined"
+                size="small"
+                disabled={membersLoading || !groupId || !token}
+                onClick={async () => {
+                  setMembersError('');
+                  setMembers([]);
+                  setMembersLoading(true);
+                  try {
+                    const response = await fetch(
+                        `${API_BASE}/groups/${groupId}/members`,
+                        {
+                          headers: {
+                            'Authorization': `Bearer ${token}`,
+                          },
+                        },
+                    );
+                    if (!response.ok) {
+                      setMembersError('Unable to load group members');
+                      return;
+                    }
+                    const data = await response.json();
+                    setMembers(data);
+                  } catch {
+                    setMembersError('Unable to load group members');
+                  } finally {
+                    setMembersLoading(false);
+                  }
+                }}
+              >
+                {membersLoading ? 'Loading members…' : 'View members'}
+              </Button>
+              {membersError && (
+                <Typography variant="body2" color="error">
+                  {membersError}
+                </Typography>
+              )}
+            </Box>
+          )}
+          {selectedGroup && members.length > 0 && (
+            <Box sx={{mb: 2}}>
+              <Typography variant="subtitle2">
+                Members of {selectedGroup.name}
+              </Typography>
+              <List dense>
+                {members.map((m) => (
+                  <ListItemText
+                    key={m.id}
+                    primary={m.displayName}
+                  />
+                ))}
+              </List>
+            </Box>
+          )}
+          <Box sx={{mb: 2}}>
+            <TextField
+              label="What do you want to share?"
+              multiline
+              minRows={2}
+              fullWidth
+              value={newPostText}
+              onChange={(e) => {
+                setNewPostText(e.target.value);
+                setNewPostError('');
+              }}
+              error={newPostText.trim() === '' && newPostText !== ''}
+              helperText={
+                newPostText.trim() === '' && newPostText !== '' ?
+                  'Post text is required' :
+                  ''
+              }
+            />
+            {newPostError && (
+              <Typography variant="body2" color="error" sx={{mt: 0.5}}>
+                {newPostError}
+              </Typography>
+            )}
+            <Box sx={{mt: 1, textAlign: 'right'}}>
+              <Button
+                variant="contained"
+                disabled={!canCreate}
+                onClick={async () => {
+                  const trimmed = newPostText.trim();
+                  if (!trimmed) {
+                    setNewPostError('Post text is required');
+                    return;
+                  }
+                  try {
+                    const response = await fetch(`${API_BASE}/posts`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
+                        text: trimmed,
+                        ...(selectedGroup ?
+                          {groupId: selectedGroup.id} :
+                          {}),
+                      }),
+                    });
+                    if (!response.ok) {
+                      setNewPostError('Unable to create post');
+                      return;
+                    }
+                    const created = await response.json();
+                    setPosts((prev) => [created, ...prev]);
+                    setNewPostText('');
+                    setNewPostError('');
+                  } catch {
+                    setNewPostError('Unable to create post');
+                  }
+                }}
+              >
+                Post
+              </Button>
+            </Box>
+          </Box>
           {loading && (
             <Box sx={{display: 'flex', justifyContent: 'center', mt: 2}}>
               <CircularProgress />

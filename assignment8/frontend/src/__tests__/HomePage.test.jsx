@@ -29,6 +29,17 @@ const DEFAULT_POST = [{
   },
 }];
 
+/** Single "Existing post" used by composer tests (create / create-error). */
+const EXISTING_POST = {
+  id: 2,
+  authorId: 1,
+  content: {
+    text: 'Existing post',
+    createdAt: '2025-01-02T10:00:00.000Z',
+    visibility: 'PUBLIC',
+  },
+};
+
 /** Apply default groups + post mocks and prepare for login. */
 function setupDefaultFeed() {
   applyLoginGroupsPostsMocks(DEFAULT_GROUPS, DEFAULT_POST);
@@ -38,6 +49,55 @@ function setupDefaultFeed() {
 async function loginAndWaitForFeed() {
   await loginAsMolly();
   await screen.findByText(/a post/i);
+}
+
+/**
+ * Set up feed with EXISTING_POST, add one POST /posts mock, then submit
+ * composer and assert "Unable to create post" is shown.
+ * @param {function(): void} addPostMock Add the single fetch mock for POST.
+ * @param {string} postText Text to type into the composer.
+ */
+async function submitComposerAndExpectCreateError(
+    addPostMock, postText = 'Will fail') {
+  applyLoginGroupsPostsMocks(DEFAULT_GROUPS, [EXISTING_POST]);
+  addPostMock();
+  await loginAsMolly();
+  await screen.findByText(/existing post/i);
+  const input = screen.getByLabelText(/what do you want to share/i);
+  await userEvent.type(input, postText);
+  const postBtn = screen.getByRole('button', {name: /^post$/i});
+  await userEvent.click(postBtn);
+  const err = await screen.findByText(/unable to create post/i);
+  expect(err).toBeInTheDocument();
+}
+
+/**
+ * Navigate to Books Club and click the View members button.
+ * Assumes user is already logged in and initial posts are visible.
+ * @returns {Promise<void>}
+ */
+async function goToBooksClubAndClickMembers() {
+  const groupButton =
+    screen.getByRole('button', {name: /books club/i});
+  await userEvent.click(groupButton);
+
+  const membersBtn =
+    await screen.findByRole('button', {name: /view members/i});
+  await userEvent.click(membersBtn);
+}
+
+/**
+ * Open the Books Club members list and assert the generic error message.
+ * Assumes fetch mocks are already configured.
+ * @returns {Promise<void>}
+ */
+async function openMembersAndExpectError() {
+  await loginAsMolly();
+  await screen.findByText(/a post/i);
+  await goToBooksClubAndClickMembers();
+  const err =
+    await screen.findByText(/unable to load group members/i);
+  expect(err).toBeInTheDocument();
 }
 
 /**
@@ -394,4 +454,157 @@ describe('HomePage', () => {
     await userEvent.click(screen.getByRole('button', {name: /delete post/i}));
     expect(screen.queryByText(/edited text/i)).not.toBeInTheDocument();
   }, 10000);
+
+  it('creates a new top-level post and shows it at the top', async () => {
+    applyLoginGroupsPostsMocks(DEFAULT_GROUPS, [EXISTING_POST]);
+    window.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        id: 3,
+        authorId: 1,
+        content: {
+          text: 'Created from composer',
+          createdAt: '2025-01-03T10:00:00.000Z',
+          visibility: 'PUBLIC',
+        },
+        reactions: {},
+      }),
+    });
+
+    await loginAsMolly();
+    await screen.findByText(/existing post/i);
+
+    const input =
+      screen.getByLabelText(/what do you want to share/i);
+    await userEvent.type(input, 'Created from composer');
+    const postBtn = screen.getByRole('button', {name: /^post$/i});
+    await userEvent.click(postBtn);
+
+    const bodyText = await screen.findByText(/created from composer/i);
+    expect(bodyText).toBeInTheDocument();
+  }, 10000);
+
+  it('shows validation error when post text is only whitespace', async () => {
+    setupDefaultFeed();
+    await loginAndWaitForFeed();
+
+    const input =
+      screen.getByLabelText(/what do you want to share/i);
+    await userEvent.type(input, '   ');
+    const postBtn = screen.getByRole('button', {name: /^post$/i});
+    await userEvent.click(postBtn);
+
+    const helpers = await screen.findAllByText(/post text is required/i);
+    expect(helpers.length).toBeGreaterThan(0);
+  }, 10000);
+
+  it('includes groupId when creating a post in a group view', async () => {
+    applyLoginGroupsPostsMocks(DEFAULT_GROUPS, [EXISTING_POST]);
+    window.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => [EXISTING_POST],
+    });
+    // Mock for POST /posts from composer
+    window.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        id: 4,
+        authorId: 1,
+        content: {
+          text: 'Group created post',
+          createdAt: '2025-01-04T10:00:00.000Z',
+          visibility: 'PUBLIC',
+          groupId: DEFAULT_GROUPS[0].id,
+        },
+        reactions: {},
+      }),
+    });
+
+    await loginAsMolly();
+    await screen.findByText(/existing post/i);
+
+    // Navigate into the group view.
+    const groupButton =
+      screen.getByRole('button', {name: /books club/i});
+    await userEvent.click(groupButton);
+
+    const input =
+      screen.getByLabelText(/what do you want to share/i);
+    await userEvent.type(input, 'Group created post');
+    const postBtn = screen.getByRole('button', {name: /^post$/i});
+    await userEvent.click(postBtn);
+
+    const created = await screen.findByText(/group created post/i);
+    expect(created).toBeInTheDocument();
+  }, 10000);
+
+  it('shows an error when post creation returns !ok', async () => {
+    const badResponse = {ok: false, json: async () => ({})};
+    await submitComposerAndExpectCreateError(
+        () => window.fetch.mockResolvedValueOnce(badResponse),
+    );
+  }, 10000);
+
+  it('shows an error when post creation throws', async () => {
+    await submitComposerAndExpectCreateError(
+        () => window.fetch.mockRejectedValueOnce(new Error('network')),
+        'Will throw',
+    );
+  }, 10000);
+
+  it(
+      'loads and displays group members when View members is clicked',
+      async () => {
+        applyLoginGroupsPostsMocks(DEFAULT_GROUPS, DEFAULT_POST);
+        // Mock group posts when navigating into Books Club.
+        window.fetch.mockResolvedValueOnce(mockPostsResponse(DEFAULT_POST));
+        // Mock members list for Books Club.
+        window.fetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => [
+            {id: 1, displayName: 'Molly Member', email: 'molly@books.com'},
+            {id: 2, displayName: 'Anna Admin', email: 'anna@books.com'},
+          ],
+        });
+
+        await loginAsMolly();
+        await screen.findByText(/a post/i);
+        await goToBooksClubAndClickMembers();
+
+        await screen.findByText(/members of books club/i);
+        const mollyEntries = screen.getAllByText(/molly member/i);
+        const annaEntries = screen.getAllByText(/anna admin/i);
+        expect(mollyEntries.length).toBeGreaterThan(0);
+        expect(annaEntries.length).toBeGreaterThan(0);
+      },
+      10000);
+
+  it(
+      'shows an error when group members fetch returns !ok',
+      async () => {
+        applyLoginGroupsPostsMocks(DEFAULT_GROUPS, DEFAULT_POST);
+        // Group posts when entering Books Club.
+        window.fetch.mockResolvedValueOnce(mockPostsResponse(DEFAULT_POST));
+        // Members endpoint returns !ok.
+        window.fetch.mockResolvedValueOnce({
+          ok: false,
+          json: async () => ({}),
+        });
+
+        await openMembersAndExpectError();
+      },
+      10000);
+
+  it(
+      'shows an error when group members fetch throws',
+      async () => {
+        applyLoginGroupsPostsMocks(DEFAULT_GROUPS, DEFAULT_POST);
+        // Group posts when entering Books Club.
+        window.fetch.mockResolvedValueOnce(mockPostsResponse(DEFAULT_POST));
+        // Members endpoint throws.
+        window.fetch.mockRejectedValueOnce(new Error('network'));
+
+        await openMembersAndExpectError();
+      },
+      10000);
 });

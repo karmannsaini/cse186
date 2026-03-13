@@ -108,5 +108,39 @@ describe('Groups API', () => {
         .expect(403);
     expect(response.body).toHaveProperty('message');
   });
+
+  test('lists members for a group the user belongs to', async () => {
+    const token =
+      await loginAndGetToken(server, 'molly@books.com', 'mollymember');
+    const response = await request(server)
+        .get(`/api/v0/groups/${BOOKS_CLUB_ID}/members`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThanOrEqual(2);
+    const names = response.body.map((m) => m.displayName);
+    expect(names).toContain('Molly Member');
+    expect(names).toContain('Anna Admin');
+  });
+
+  test('rejects unauthenticated access to group members with 401', async () => {
+    const response = await request(server)
+        .get(`/api/v0/groups/${BOOKS_CLUB_ID}/members`)
+        .expect(401);
+    expect(response.body).toHaveProperty('message');
+  });
+
+  test(
+      'rejects members listing for group user is not a member of',
+      async () => {
+        const token =
+          await loginAndGetToken(server, 'molly@books.com', 'mollymember');
+        const response = await request(server)
+            .get(`/api/v0/groups/${ADMINS_ONLY_ID}/members`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(403);
+        expect(response.body).toHaveProperty('message');
+      },
+  );
 });
 
