@@ -20,7 +20,8 @@
     "vite-plugin-eslint": "*"
   },
   "scripts": {
-    "docker": "cd ../backend && docker compose down && docker compose up -d",
+    "predocker": "node ./test/checkBackendEnv.js",
+    "docker": "cd ../backend && docker compose down -v && docker compose up -d",
     "build": "cd ../frontend && npm run build",
     "e2e": "vitest run --no-file-parallelism --testTimeout=20000",
     "test": "(npm run build) && (npm run docker) && (npm run e2e)",

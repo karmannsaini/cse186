@@ -1,8 +1,3 @@
-/**
- * E2E setup: starts backend + static frontend, launches Puppeteer per test.
- * Prerequisites on every device: run `npm run build` in frontend (so dist/ exists),
- * and ensure backend .env + DB are configured (e.g. docker). Ports 3000 and 3010 must be free.
- */
 import {beforeAll, afterAll, beforeEach, afterEach} from 'vitest';
 import puppeteer from 'puppeteer';
 import path from 'node:path';
