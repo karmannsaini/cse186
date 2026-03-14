@@ -4,9 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import express from 'express';
 import http from 'node:http';
-
-import 'dotenv/config';
-import backend from '../../backend/src/app.js';
+import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,10 +13,18 @@ const distRoot = path.join(__dirname, '..', '..', 'frontend', 'dist');
 export let frontend;
 export let browser;
 export let page;
+let backend;
 
 const UI_PORT = 3000;
 const API_PORT = 3010;
 export const BASE_URL = `http://localhost:${UI_PORT}`;
+
+const backendEnvPath = path.join(__dirname, '..', '..', 'backend', '.env');
+dotenv.config({path: backendEnvPath, quiet: true});
+process.env.POSTGRES_DB = process.env.POSTGRES_DB || 'dev';
+process.env.POSTGRES_USER = process.env.POSTGRES_USER || 'postgres';
+process.env.POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || 'postgres';
+process.env.SECRET = process.env.SECRET || 'dev-secret';
 
 /**
  * Start a server listening on the given port.
@@ -53,6 +59,9 @@ function close(server) {
  * @returns {Promise<void>} resolves when both servers are listening
  */
 beforeAll(async () => {
+  const backendModule = await import('../../backend/src/app.js');
+  backend = backendModule.default;
+
   const frontendApp = express();
   frontendApp.use(express.static(distRoot));
   frontendApp.use((_req, res) => {
