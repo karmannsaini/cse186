@@ -13,11 +13,15 @@ describe('Posts Feed', () => {
     await page.type('input[autocomplete="current-password"]',
         TEST_USER.password);
 
-    await Promise.all([
-      page.waitForNavigation({waitUntil: 'networkidle0'}),
-      page.click('button[type="submit"]'),
-    ]);
-  });
+    await page.click('button[type="submit"]');
+    await page.waitForFunction(
+        () => {
+          const p = window.location.pathname;
+          return p === '/home' || p === '/home/';
+        },
+        {timeout: 15000},
+    );
+  }, 20000);
 
   it('displays a list of posts for the authenticated user', async () => {
     await page.waitForSelector('::-p-text(Welcome to your feed)');

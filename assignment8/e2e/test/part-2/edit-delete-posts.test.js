@@ -14,10 +14,14 @@ async function login() {
   await page.waitForSelector('input[autocomplete="email"]');
   await page.type('input[autocomplete="email"]', TEST_USER.email);
   await page.type('input[autocomplete="current-password"]', TEST_USER.password);
-  await Promise.all([
-    page.waitForNavigation({waitUntil: 'networkidle0'}),
-    page.click('button[type="submit"]'),
-  ]);
+  await page.click('button[type="submit"]');
+  await page.waitForFunction(
+      () => {
+        const p = window.location.pathname;
+        return p === '/home' || p === '/home/';
+      },
+      {timeout: 15000},
+  );
   await page.waitForSelector('::-p-text(Welcome to your feed)');
 }
 

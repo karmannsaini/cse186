@@ -15,10 +15,14 @@ describe('Authentication Flow', () => {
     await page.type('input[autocomplete="current-password"]',
         TEST_USER.password);
 
-    await Promise.all([
-      page.waitForNavigation({waitUntil: 'networkidle0'}),
-      page.click('button[type="submit"]'),
-    ]);
+    await page.click('button[type="submit"]');
+    await page.waitForFunction(
+        () => {
+          const p = window.location.pathname;
+          return p === '/home' || p === '/home/';
+        },
+        {timeout: 15000},
+    );
 
     const feedHeading = await page.waitForSelector(
         '::-p-text(Welcome to your feed)',
@@ -54,10 +58,14 @@ describe('Authentication Flow', () => {
     await page.click('input[autocomplete="current-password"]', {clickCount: 3});
     await page.type('input[autocomplete="current-password"]',
         TEST_USER.password);
-    await Promise.all([
-      page.waitForNavigation({waitUntil: 'networkidle0'}),
-      page.click('button[type="submit"]'),
-    ]);
+    await page.click('button[type="submit"]');
+    await page.waitForFunction(
+        () => {
+          const p = window.location.pathname;
+          return p === '/home' || p === '/home/';
+        },
+        {timeout: 15000},
+    );
 
     const feedHeading = await page.waitForSelector(
         '::-p-text(Welcome to your feed)',
@@ -72,10 +80,14 @@ describe('Authentication Flow', () => {
     await page.type('input[autocomplete="current-password"]',
         TEST_USER.password);
 
-    await Promise.all([
-      page.waitForNavigation({waitUntil: 'networkidle0'}),
-      page.click('button[type="submit"]'),
-    ]);
+    await page.click('button[type="submit"]');
+    await page.waitForFunction(
+        () => {
+          const p = window.location.pathname;
+          return p === '/home' || p === '/home/';
+        },
+        {timeout: 15000},
+    );
 
     const logoutBtn = await page.waitForSelector('::-p-text(Logout)');
     expect(logoutBtn).not.toBeNull();
