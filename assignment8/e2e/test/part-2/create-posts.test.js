@@ -76,8 +76,15 @@ describe('Create posts', () => {
   it('creates a post in group view and shows it', async () => {
     await page.waitForSelector('.MuiCard-root', {timeout: 5000});
     const menuButton = await page.$('button[aria-label=\'open menu\']');
-    await menuButton.click();
-    menuButton.dispose();
+    if (menuButton) {
+      const isVisible = await menuButton.evaluate(
+          (el) => el.offsetParent !== null,
+      );
+      if (isVisible) {
+        await menuButton.click();
+      }
+      menuButton.dispose();
+    }
     await page.waitForSelector('::-p-text(Books Club)', {timeout: 5000});
     await page.waitForSelector('.MuiListItemButton-root', {timeout: 5000});
     const listItems = await page.$$('.MuiListItemButton-root');
