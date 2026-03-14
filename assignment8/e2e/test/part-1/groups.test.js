@@ -26,7 +26,7 @@ describe('Groups and Deep Linking', () => {
 
   it('displays a list of groups the user belongs to', async () => {
     await page.waitForSelector('::-p-text(Welcome to your feed)');
-    await page.waitForSelector('.MuiListItemButton-root', {timeout: 5000});
+    await page.waitForSelector('.MuiListItemButton-root', {timeout: 15000});
 
     const listItems = await page.$$('.MuiListItemButton-root');
     expect(listItems.length).toBeGreaterThan(3);
@@ -40,7 +40,7 @@ describe('Groups and Deep Linking', () => {
 
   it('filters posts and deep links the URL on select', async () => {
     await page.waitForSelector('::-p-text(Welcome to your feed)');
-    await page.waitForSelector('.MuiListItemButton-root', {timeout: 5000});
+    await page.waitForSelector('.MuiListItemButton-root', {timeout: 15000});
 
     const listItems = await page.$$('.MuiListItemButton-root');
     const firstGroupBtn = listItems[1];
@@ -50,7 +50,7 @@ describe('Groups and Deep Linking', () => {
 
     await page.waitForFunction(
         () => window.location.href.includes('/home/group/'),
-        {timeout: 5000},
+        {timeout: 15000},
     );
     expect(page.url()).toContain('/home/group/');
 
@@ -59,11 +59,11 @@ describe('Groups and Deep Linking', () => {
           const h5 = document.querySelector('h5');
           return h5 && h5.textContent === name;
         },
-        {timeout: 5000},
+        {timeout: 15000},
         groupName,
     );
 
-    await page.waitForSelector('.MuiCard-root', {timeout: 5000});
+    await page.waitForSelector('.MuiCard-root', {timeout: 15000});
     const posts = await page.$$('.MuiCard-root');
     expect(posts.length).toBeGreaterThan(0);
   });
@@ -78,7 +78,7 @@ describe('Groups and Deep Linking', () => {
 
         await page.waitForFunction(
             () => document.body.innerText.includes('Books Club'),
-            {timeout: 5000},
+            {timeout: 15000},
         );
         const bodyText = await page.evaluate(() => document.body.innerText);
         expect(bodyText).toContain('Books Club');
@@ -88,13 +88,13 @@ describe('Groups and Deep Linking', () => {
   it('navigating to All posts returns to main feed and updates URL',
       async () => {
         await page.waitForSelector('::-p-text(Welcome to your feed)');
-        await page.waitForSelector('.MuiListItemButton-root', {timeout: 5000});
+        await page.waitForSelector('.MuiListItemButton-root', {timeout: 15000});
 
         const listItems = await page.$$('.MuiListItemButton-root');
         await listItems[1].evaluate((b) => b.click());
         await page.waitForFunction(
             () => window.location.href.includes('/home/group/'),
-            {timeout: 5000},
+            {timeout: 15000},
         );
 
         const listButtons = await page.$$('.MuiListItemButton-root');
@@ -111,7 +111,7 @@ describe('Groups and Deep Linking', () => {
               const u = window.location.pathname;
               return u === '/home' || u === '/home/';
             },
-            {timeout: 5000},
+            {timeout: 15000},
         );
         const bodyText = await page.evaluate(() => document.body.innerText);
         expect(bodyText).toContain('Welcome to your feed');

@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2026-03-13T21:13:13.013Z",
+    "detectionDate": "2026-03-13T23:41:01.501Z",
     "formats": {
       "jsx": {
         "sources": {
@@ -149,8 +149,8 @@
             "newClones": 0
           },
           "H:/School/CSE186/assignment8/frontend/src/auth/LoginPage.jsx": {
-            "lines": 127,
-            "tokens": 996,
+            "lines": 133,
+            "tokens": 1035,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -210,8 +210,8 @@
           }
         },
         "total": {
-          "lines": 2648,
-          "tokens": 21277,
+          "lines": 2654,
+          "tokens": 21316,
           "sources": 17,
           "clones": 0,
           "duplicatedLines": 0,
@@ -396,8 +396,8 @@
       }
     },
     "total": {
-      "lines": 3512,
-      "tokens": 28658,
+      "lines": 3518,
+      "tokens": 28697,
       "sources": 30,
       "clones": 0,
       "duplicatedLines": 0,

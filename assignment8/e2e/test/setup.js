@@ -1,3 +1,8 @@
+/**
+ * E2E setup: starts backend + static frontend, launches Puppeteer per test.
+ * Prerequisites on every device: run `npm run build` in frontend (so dist/ exists),
+ * and ensure backend .env + DB are configured (e.g. docker). Ports 3000 and 3010 must be free.
+ */
 import {beforeAll, afterAll, beforeEach, afterEach} from 'vitest';
 import puppeteer from 'puppeteer';
 import path from 'node:path';
@@ -73,12 +78,17 @@ afterAll(async () => {
   ]);
 });
 
+/** Timeout (ms) for selectors and navigation; increase on slower devices. */
+const DEFAULT_TIMEOUT_MS = 15000;
+
 beforeEach(async () => {
   browser = await puppeteer.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   page = await browser.newPage();
+  await page.setViewport({width: 1280, height: 800});
+  page.setDefaultTimeout(DEFAULT_TIMEOUT_MS);
   await page.goto(BASE_URL);
 });
 
@@ -87,6 +97,8 @@ afterEach(async () => {
     await browser.close();
   }
 });
+
+export const DEFAULT_TIMEOUT = DEFAULT_TIMEOUT_MS;
 
 export const clickOn = async (p, selector) => {
   const clickable = await p.waitForSelector(selector);

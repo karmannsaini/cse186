@@ -27,7 +27,7 @@ async function login() {
  * @returns {Promise<import('puppeteer').ElementHandle<Element>>} card handle
  */
 async function findOwnPostCard() {
-  await page.waitForSelector('.MuiCard-root', {timeout: 5000});
+  await page.waitForSelector('.MuiCard-root', {timeout: 15000});
   const cards = await page.$$('.MuiCard-root');
   expect(cards.length).toBeGreaterThan(0);
 
@@ -79,7 +79,7 @@ describe('Edit and delete posts', () => {
           const body = el.querySelector('.MuiTypography-body1');
           return (body?.textContent || '').includes('Edited in E2E');
         },
-        {timeout: 5000},
+        {timeout: 15000},
         cardHandle,
     );
 
@@ -148,7 +148,7 @@ describe('Edit and delete posts', () => {
                 return (body?.textContent || '').trim() === text;
               });
             },
-            {timeout: 5000},
+            {timeout: 15000},
             bodyText,
         );
       },

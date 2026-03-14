@@ -4,8 +4,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
+import GlobalStyles from '@mui/material/GlobalStyles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -47,6 +47,11 @@ function LoginPage() {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
+      <GlobalStyles
+        styles={{
+          'input[type="password"]::-ms-reveal': {display: 'none !important'},
+        }}
+      />
       <Box
         sx={{
           marginTop: 8,
@@ -111,14 +116,6 @@ function LoginPage() {
           >
             Sign In
           </Button>
-          <Box sx={{display: 'flex', justifyContent: 'space-between', mt: 1}}>
-            <Link href="#" variant="body2">
-              Forgot password?
-            </Link>
-            <Link href="#" variant="body2">
-              {'Don\'t have an account? Sign Up'}
-            </Link>
-          </Box>
         </Box>
       </Box>
     </Container>

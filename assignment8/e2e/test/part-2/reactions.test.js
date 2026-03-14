@@ -26,7 +26,7 @@ const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 describe('Post reactions', () => {
   it('allows setting, switching, and clearing a reaction', async () => {
     await login();
-    await page.waitForSelector('.MuiCard-root', {timeout: 5000});
+    await page.waitForSelector('.MuiCard-root', {timeout: 15000});
 
     const firstCard = (await page.$$('.MuiCard-root'))[0];
     expect(firstCard).toBeDefined();
@@ -87,7 +87,7 @@ describe('Post reactions', () => {
 
   it('persists reactions between All posts and group view', async () => {
     await login();
-    await page.waitForSelector('.MuiCard-root', {timeout: 5000});
+    await page.waitForSelector('.MuiCard-root', {timeout: 15000});
 
     const cards = await page.$$('.MuiCard-root');
     expect(cards.length).toBeGreaterThan(0);
@@ -138,7 +138,7 @@ describe('Post reactions', () => {
     const likeAfterAll = await readCountFrom(targetCard, 'Like');
     expect(likeAfterAll).toBeGreaterThanOrEqual(likeBeforeAll);
 
-    await page.waitForSelector('.MuiListItemButton-root', {timeout: 5000});
+    await page.waitForSelector('.MuiListItemButton-root', {timeout: 15000});
     const listItems = await page.$$('.MuiListItemButton-root');
     let clicked = false;
     for (const item of listItems) {
@@ -153,9 +153,9 @@ describe('Post reactions', () => {
 
     await page.waitForFunction(
         () => window.location.href.includes('/home/group/'),
-        {timeout: 5000},
+        {timeout: 15000},
     );
-    await page.waitForSelector('.MuiCard-root', {timeout: 5000});
+    await page.waitForSelector('.MuiCard-root', {timeout: 15000});
 
     const groupCards = await page.$$('.MuiCard-root');
     let matching = null;
