@@ -26,7 +26,19 @@ async function loadMembershipOrSendForbidden(res, userId, groupId) {
   return membership;
 }
 
-/* eslint-disable jsdoc/require-jsdoc */
+/**
+ * Wrap a route handler with group membership authorization.
+ * @param {(req: import('express').Request,
+ *   res: import('express').Response,
+ *   next: import('express').NextFunction,
+ *   userId: number,
+ *   groupId: string) => Promise<void>} handler
+ *   route handler called after authorization
+ * @returns {(req: import('express').Request,
+ *   res: import('express').Response,
+ *   next: import('express').NextFunction) => Promise<void>}
+ *   Express middleware handler
+ */
 function withGroupMembership(handler) {
   return async (req, res, next) => {
     try {
@@ -44,7 +56,6 @@ function withGroupMembership(handler) {
     }
   };
 }
-/* eslint-enable jsdoc/require-jsdoc */
 
 groupRouter.get('/', async (req, res, next) => {
   try {

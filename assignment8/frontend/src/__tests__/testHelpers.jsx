@@ -106,18 +106,8 @@ export async function loginAsMolly(renderFn = renderApp) {
  * @returns {void}
  */
 export function applyLoginGroupsPostsMocks(groups, posts) {
-  window.fetch.mockImplementation((input) => {
-    const url = String(input);
-    if (url.includes('/api/v0/auth/login')) {
-      return Promise.resolve(mockLoginResponse());
-    }
-    if (url.includes('/api/v0/groups') && !url.includes('/posts')) {
-      return Promise.resolve(mockGroupsResponse(groups));
-    }
-    if (url.includes('/api/v0/posts') ||
-      (url.includes('/api/v0/groups/') && url.includes('/posts'))) {
-      return Promise.resolve(mockPostsResponse(posts));
-    }
-    return Promise.resolve({ok: false, json: async () => ({})});
-  });
+  window.fetch
+      .mockResolvedValueOnce(mockLoginResponse())
+      .mockResolvedValueOnce(mockGroupsResponse(groups))
+      .mockResolvedValueOnce(mockPostsResponse(posts));
 }

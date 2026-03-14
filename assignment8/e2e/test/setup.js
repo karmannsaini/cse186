@@ -82,7 +82,6 @@ afterAll(async () => {
   ]);
 });
 
-/** Timeout (ms) for selectors and navigation; increase on slower devices. */
 const DEFAULT_TIMEOUT_MS = 15000;
 
 beforeEach(async () => {
