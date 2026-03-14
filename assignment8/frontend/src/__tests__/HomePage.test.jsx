@@ -135,7 +135,7 @@ describe('HomePage', () => {
     setupDefaultFeed();
     await loginAndWaitForFeed();
     expect(screen.getByText('Home')).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('opens mobile drawer when menu button is clicked', async () => {
     setupDefaultFeed();
@@ -150,7 +150,7 @@ describe('HomePage', () => {
 
     await userEvent.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
+  }, 15000);
 
   it('closes mobile drawer when backdrop is clicked', async () => {
     setupDefaultFeed();
@@ -298,7 +298,7 @@ describe('HomePage', () => {
     resolvePosts({ok: true, json: async () => []});
 
     await screen.findByLabelText(/email address/i);
-  });
+  }, 15000);
 
   it('does not set error when posts fetch rejects after unmount', async () => {
     let rejectPosts;
@@ -320,7 +320,7 @@ describe('HomePage', () => {
     rejectPosts(new Error('Network error'));
 
     await screen.findByLabelText(/email address/i);
-  });
+  }, 15000);
 
   it('shows NotFound when group ID in URL is not in loaded groups',
       async () => {

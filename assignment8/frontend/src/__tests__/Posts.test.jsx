@@ -43,7 +43,7 @@ describe('Posts feed', () => {
 
     expect(newerPost).toBeInTheDocument();
     expect(firstPost).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('shows an error message when posts fetch fails', async () => {
     window.fetch

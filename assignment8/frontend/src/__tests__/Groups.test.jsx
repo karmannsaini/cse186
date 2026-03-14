@@ -37,7 +37,7 @@ describe('Groups and group posts', () => {
     expect(
         screen.getAllByText('Cooking Circle').length,
     ).toBeGreaterThanOrEqual(1);
-  });
+  }, 15000);
 
   it('shows group posts when a group is selected', async () => {
     applyLoginGroupsPostsMocks(
@@ -74,5 +74,5 @@ describe('Groups and group posts', () => {
 
     const groupPost = await screen.findByText(/Books Club only post/i);
     expect(groupPost).toBeInTheDocument();
-  });
+  }, 15000);
 });

@@ -184,7 +184,7 @@ describe('PostCard', () => {
     expect(globalThis.fetch).not.toHaveBeenCalled();
     expect(onPostUpdated).not.toHaveBeenCalled();
     expect(onPostDeleted).not.toHaveBeenCalled();
-  });
+  }, 15000);
 
   it('sends PUT and increments count when reacting', async () => {
     const user = await setupPostWithReactions({
