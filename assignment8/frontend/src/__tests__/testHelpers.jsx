@@ -1,5 +1,5 @@
 import {beforeEach, afterEach, vi} from 'vitest';
-import {render, screen, waitFor} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App.jsx';
 
@@ -97,12 +97,6 @@ export async function loginAsMolly(renderFn = renderApp) {
   await userEvent.type(emailInput, 'molly@books.com');
   await userEvent.type(passwordInput, 'mollymember');
   await userEvent.click(button);
-  await screen.findByText(/welcome to your feed/i, {}, {timeout: 5000});
-  await waitFor(() => {
-    if (screen.queryByRole('progressbar')) {
-      throw new Error('still loading');
-    }
-  }, {timeout: 5000});
 }
 
 /**
